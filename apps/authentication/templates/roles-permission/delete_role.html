@@ -1,0 +1,13 @@
+<!-- filepath: /var/www/html/sneat-bootstrap-html-django-admin-template-free/apps/authentication/templates/roles-permission/delete_role.html -->
+{% extends layout_path %}
+
+{% block content %}
+<h2>Delete Role</h2>
+<p>Are you sure you want to delete the role "{{ role.name }}"? This action cannot be undone.</p>
+
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Delete Role</button>
+    <a href="{% url 'manage_roles' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

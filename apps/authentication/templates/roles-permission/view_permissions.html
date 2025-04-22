@@ -1,0 +1,64 @@
+<!-- filepath: /var/www/html/sneat-bootstrap-html-django-admin-template-free/apps/authentication/templates/roles-permission/manage_permissions.html -->
+{% extends layout_path %}
+{% load custom_tags %}
+{% block content %}
+<h2>Manage Permissions for Role: {{ role.name }}</h2>
+<form method="post">
+  {% csrf_token %}
+
+  <div class="mb-3">
+    <label for="id_name" class="form-label">Role Name</label>
+    <input type="text" class="form-control" id="id_name" name="name" value="{{ form.name.value }}" required>
+  </div>
+  <table class="table table-bordered mt-3">
+    <thead>
+        <tr>
+            <th>App | Model</th>
+            {% for label in permission_labels %}
+                <th>{{ label|capfirst }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for group in grouped_permissions %}
+            <tr>
+                <td><strong>{{ group.app_model.0|capfirst }}</strong> | {{ group.app_model.1|capfirst }}</td>
+                {% for perm in group.permissions %}
+                    <td>
+                        {% if perm.permission %}
+                            <input type="checkbox" name="permissions" value="{{ perm.permission.id }}"
+                                {% if perm.permission in form.instance.permissions.all %}checked{% endif %}>
+                        {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+
+  <button type="submit" class="btn btn-primary">Save Permissions</button>
+  <a href="{% url 'view-roles' %}" class="btn btn-secondary mt-3">Back to Roles</a>
+</form>
+{% comment %} <a href="{% url 'view-roles' %}" class="btn btn-secondary mt-3">Back to Roles</a> {% endcomment %}
+{% endblock %}
+
+{% comment %} {% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Roles & Permissions - Authentications{% endblock %}
+
+{% block page_js %}
+  {{ block.super }}
+  <script src="{% static 'js/pages-account-settings-account.js' %}"></script>
+{% endblock page_js %}
+
+{% block content %}
+<h2>Manage Permissions for Role: {{ role.name }}</h2>
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Update Permissions</button>
+</form>
+{% endblock %} {% endcomment %}

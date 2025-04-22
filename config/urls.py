@@ -20,6 +20,8 @@ from django.urls import include, path
 from web_project.views import SystemView
 
 urlpatterns = [
+    path('oauth/', include('social_django.urls', namespace='social')),
+
     path("admin/", admin.site.urls),
 
     # Dashboard urls
@@ -54,6 +56,12 @@ urlpatterns = [
 
     # Tables urls
     path("", include("apps.tables.urls")),
+
+    # Social urls
+    path("", include("apps.social.urls")),
+
+    # Users urls
+    path("", include("apps.users.urls")),
 ]
 
 handler404 = SystemView.as_view(template_name="pages_misc_error.html", status=404)

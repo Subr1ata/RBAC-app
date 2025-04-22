@@ -1,0 +1,7 @@
+<!-- filepath: /var/www/html/sneat-bootstrap-html-django-admin-template-free/apps/authentication/templates/authentication/assign_role.html -->
+<h2>Assign Role</h2>
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Assign Role</button>
+</form>

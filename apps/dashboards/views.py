@@ -1,5 +1,8 @@
 from django.views.generic import TemplateView
 from web_project import TemplateLayout
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from config.decorators import allowed_users
 
 
 """
@@ -16,3 +19,11 @@ class DashboardsView(TemplateView):
         context = TemplateLayout.init(self, super().get_context_data(**kwargs))
 
         return context
+
+    @login_required(login_url='/auth/login/')
+    # @allowed_users(allowed_roles=['admin'])
+    def home(request):
+        context = {}
+        context = TemplateLayout().init(context)
+
+        return render(request, 'dashboard_analytics.html', context)

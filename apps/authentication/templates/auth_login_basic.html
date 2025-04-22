@@ -7,6 +7,9 @@
 
 {% block page_css %}
 {{ block.super }}
+<!-- Include Toastr CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+
 <link rel="stylesheet" href="{% static  'vendor/css/pages/page-auth.css' %}">
 {% endblock page_css %}
 
@@ -14,6 +17,14 @@
 <div class="container-xxl">
   <div class="authentication-wrapper authentication-basic container-p-y">
     <div class="authentication-inner">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
       <!-- Login -->
       <div class="card px-sm-6 px-0">
         <div class="card-body">
@@ -28,7 +39,7 @@
           <h4 class="mb-1">Welcome to {% get_theme_variables 'template_name' %}! 👋</h4>
           <p class="mb-6">Please sign-in to your account and start the adventure</p>
 
-          <form id="formAuthentication" class="mb-6" action="{% url 'index' %}">
+          <form id="formAuthentication" class="mb-6" method="POST" action="{% url 'auth-login-basic' %}">
             {% csrf_token %}
             <div class="mb-6">
               <label for="email" class="form-label">Email or Username</label>
@@ -71,4 +82,24 @@
     </div>
   </div>
 </div>
+<!-- Include Toastr JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+{% comment %} {% if messages %} {% endcomment %}
+      <script>
+        console.log('hehe');
+        {% for message in messages %}
+          console.log("{{ message }}");
+        {% endfor %}
+        {% for message in messages %}
+          toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "timeOut": "5000",
+          };
+            toastr.success("{{ message }}");
+
+        {% endfor %}
+      </script>
+    {% comment %} {% endif %} {% endcomment %}
 {% endblock %}

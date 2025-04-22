@@ -1,0 +1,135 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Users - Pages{% endblock %}
+
+{% block content %}
+<!-- Basic Bootstrap Table -->
+<div class="card">
+  <h5 class="card-header">Users</h5>
+  <div class="table-responsive text-nowrap">
+    {% if perms.users.add_customuser %}
+      <a class="btn btn-primary m-2" href="{% url 'create_user' %}">Create User</a>
+    {% endif %}
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Table to display roles -->
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Roles</th>
+          <th>Date Joined</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody class="table-border-bottom-0">
+        {% for user in users %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td><span>{{ user.username }}</span></td>
+          <td><span>{{ user.email }}</span></td>
+
+          <td>
+            {% for role in user.roles.all %}
+                <a href="{% url 'edit-role' role.id %}" class="btn btn-sm btn-info me-1">
+                    {{ role.name }}
+                </a>
+            {% empty %}
+                <span class="text-muted">No roles assigned</span>
+            {% endfor %}
+          </td>
+          <td>
+            <span class="badge bg-label-primary me-1">{{ user.date_joined }}</span>
+          <td>
+            <div class="dropdown">
+              <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                <i class="bx bx-dots-vertical-rounded"></i>
+              </button>
+              <div class="dropdown-menu">
+                <!-- Edit Action -->
+                {% if perms.users.change_customuser %}
+                  <a class="dropdown-item" href="{% url 'edit_user' user.id %}">
+                    <i class="bx bx-edit-alt me-1"></i> Edit
+                  </a>
+                {% endif %}
+
+                {% if perms.users.delete_customuser %}
+                  <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#deleteModal{{ user.id }}">
+                    <i class="bx bx-trash me-1"></i> Delete
+                  </button>
+                {% endif %}
+
+                {% if not perms.users.change_customuser and not perms.users.delete_customuser %}
+                 <span>You cannot perform update and delete</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Modal to view this specific user -->
+            <div class="modal fade" id="modalCenter{{ user.id }}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                  <form method="POST" action="#">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                      <h5 class="modal-title">Confirm Deletion</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      Are you sure you want to delete the user <strong>{{ user.username }}</strong>?
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                      <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <!-- Modal to delete this specific user -->
+            <div class="modal fade" id="deleteModal{{ user.id }}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                  <form method="POST" action="{% url 'delete_user' user.id %}">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                      <h5 class="modal-title">Confirm Deletion</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      Are you sure you want to delete the user <strong>{{ user.username }}</strong>?
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                      <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" class="text-center">No users found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

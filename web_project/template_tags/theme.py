@@ -10,4 +10,5 @@ register = template.Library()
 
 @register.simple_tag
 def get_theme_variables(scope):
+    print(f"Loading theme variables for {scope}")
     return mark_safe(TemplateHelper.get_theme_variables(scope))

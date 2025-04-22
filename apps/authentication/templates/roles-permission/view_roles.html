@@ -1,0 +1,101 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Roles & Permission - Authentications{% endblock %}
+
+{% block content %}
+<!-- Basic Bootstrap Table -->
+<div class="card">
+  <h5 class="card-header">Roles & Permission</h5>
+  <div class="table-responsive text-nowrap">
+
+    <!-- Form to create a new role -->
+    {% comment %} <form method="POST" class="mb-4"> {% endcomment %}
+        {% comment %} {% csrf_token %} {% endcomment %}
+        {% comment %} {{ form.as_p }} {% endcomment %}
+    {% comment %} </form> {% endcomment %}
+    <a class="btn btn-primary m-2" href="/auth/manage-roles">Create Role</a>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Table to display roles -->
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Role Name</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody class="table-border-bottom-0">
+        {% for role in roles %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td><a href="{% url 'view-permissions' role.id %}" class="btn btn-sm btn-info">{{ role.name }}</a></td>
+          <td>
+            <span class="badge bg-label-primary me-1">Active</span>
+          </td>
+          <td>
+            <div class="dropdown">
+              <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                <i class="bx bx-dots-vertical-rounded"></i>
+              </button>
+              <div class="dropdown-menu">
+                <!-- Edit Action -->
+                <a class="dropdown-item" href="{% url 'edit-role' role.id %}">
+                  <i class="bx bx-edit-alt me-1"></i> Edit
+                </a>
+                <!-- Delete Action -->
+                {% comment %} <a class="dropdown-item" href="{% url 'delete-role' role.id %}">
+                  <i class="bx bx-trash me-1"></i> Delete
+                </a> {% endcomment %}
+
+                <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#modalCenter{{ role.id }}">
+                  <i class="bx bx-trash me-1"></i> Delete
+                </button>
+              </div>
+            </div>
+
+            <!-- Modal for this specific role -->
+            <div class="modal fade" id="modalCenter{{ role.id }}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                  <form method="POST" action="{% url 'delete-role' role.id %}">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                      <h5 class="modal-title">Confirm Deletion</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      Are you sure you want to delete the role <strong>{{ role.name }}</strong>?
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                      <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" class="text-center">No roles found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

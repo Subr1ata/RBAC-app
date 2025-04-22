@@ -1,0 +1,105 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Edit User{% endblock %}
+
+{% block content %}
+<!-- filepath: /var/www/html/sneat-bootstrap-html-django-admin-template-free/apps/users/templates/edit_user.html -->
+{% comment %} <div class="container mt-5">
+    <h2 class="text-center mb-4">Edit User</h2>
+    <form method="POST">
+      {% csrf_token %}
+      <div class="mb-3">
+        {{ form.username.label_tag }}
+        {{ form.username }}
+        {% if form.username.errors %}
+            <div class="text-danger">{{ form.username.errors }}</div>
+        {% endif %}
+      </div>
+      <div class="mb-3">
+          {{ form.email.label_tag }}
+          {{ form.email }}
+          {% if form.email.errors %}
+              <div class="text-danger">{{ form.email.errors }}</div>
+          {% endif %}
+      </div>
+      <div class="mb-3">
+          <label for="role" class="form-label">Role</label>
+          <select name="role" id="role" class="form-select">
+              <option value="">Select a role</option>
+              {% for role in roles %}
+                  <option value="{{ role.id }}" {% if role.id in user_roles %}selected{% endif %}>
+                      {{ role.name }}
+                  </option>
+              {% endfor %}
+          </select>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Update User</button>
+    </form>
+</div> {% endcomment %}
+<div class="card">
+  <div class="card-body">
+    <form class="add-transactions pt-0 fv-plugins-bootstrap5 fv-plugins-framework" id="addTransactionForm" action="/sneat-html-django-admin-template/demo-1/transactions/add/" method="post" novalidate="novalidate">
+      <input type="hidden" name="csrfmiddlewaretoken" value="41H6KJ9y9pYLX57aCdA4RRIrO4AoqUWj1Vu8elmziF0RvsowD0VZp3008OtxE7oz">
+      <div class="mb-5 fv-plugins-icon-container">
+        <label class="form-label" for="customer-name">Customer</label>
+        <input type="text" class="form-control" id="customer-name" name="customer" placeholder="Full Name">
+      <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
+      <div class="mb-5 fv-plugins-icon-container">
+        <label class="form-label" for="transaction-date">Transaction date</label>
+        <input type="text" id="transaction-date" class="form-control flatpickr-input" name="transaction_date" value="2025-04-21" placeholder="Transaction Date" readonly="readonly">
+      <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
+      <div class="mb-5 fv-plugins-icon-container">
+        <label class="form-label" for="due-date">Due date</label>
+        <input type="text" id="due-date" class="form-control flatpickr-input" name="due_date" placeholder="Due Date" readonly="readonly">
+      <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
+      <div class="mb-5 fv-plugins-icon-container">
+        <label class="form-label" for="total-amount">Total Amount</label>
+        <input type="number" id="total-amount" name="total" class="form-control" placeholder="Total Amount">
+      <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
+      <div class="mb-5 fv-plugins-icon-container">
+        <label class="form-label" for="customer-status">Status</label>
+        <div class="position-relative"><select id="customer-status" class="select2 form-select select2-hidden-accessible" name="status" data-select2-id="customer-status" tabindex="-1" aria-hidden="true">
+          {% comment %} <option value="" disabled="" selected="" class="d-none" data-select2-id="2"></option>
+          <option value="Paid">Paid</option>
+          <option value="Due">Due</option>
+          <option value="Canceled">Canceled</option> {% endcomment %}
+        </select>
+      </div>
+      <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
+      <button type="submit" class="btn btn-primary me-sm-4 me-1" name="submitButton">Submit</button>
+      <a href="/sneat-html-django-admin-template/demo-1/transactions/list/" class="btn btn-secondary">Back</a>
+    <input type="hidden"></form>
+  </div>
+</div>
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Include Select2 JavaScript -->
+{% comment %} <script src="{% static 'vendor/libs/select2/select2.min.js' %}"></script> {% endcomment %}
+
+
+<script>
+  $(document).ready(function() {
+    // Populate the select element dynamically (if needed)
+    const options = [
+      { id: 'Paid', text: 'Paid' },
+      { id: 'Due', text: 'Due' },
+      { id: 'Canceled', text: 'Canceled' }
+    ];
+
+    const $select = $('#customer-status');
+    options.forEach(option => {
+      $select.append(new Option(option.text, option.id));
+    });
+
+    // Initialize Select2
+    $select.select2({
+      placeholder: "Select Status",
+      allowClear: true
+    });
+  });
+</script>
+{% endblock %}

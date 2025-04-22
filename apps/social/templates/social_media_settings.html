@@ -1,0 +1,139 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% comment %} {% load json_script %} {% endcomment %}
+{% block title %}Social Media Integrations - Pages{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Social Media Integrations</h5>
+        </div>
+        {% if messages %}
+          <div class="alert alert-success">
+            {% for message in messages %}
+              {{ message }}
+            {% endfor %}
+          </div>
+        {% endif %}
+        <div class="card-body">
+          <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="platform" class="form-label">Platform</label>
+              <select name="platform" id="platform" class="form-select" required>
+                <option value="facebook">Facebook</option>
+                <option value="instagram">Instagram</option>
+              </select>
+            </div>
+
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" id="is_enabled" name="is_enabled">
+              <label class="form-check-label" for="is_enabled">Enable</label>
+            </div>
+
+            <div class="mb-3">
+              <label for="api_key" class="form-label">API Key</label>
+              <input type="text" class="form-control" name="api_key" id="api_key">
+            </div>
+
+            <div class="mb-3">
+              <label for="api_secret" class="form-label">API Secret</label>
+              <input type="text" class="form-control" name="api_secret" id="api_secret">
+            </div>
+
+            <div class="mb-3">
+              <label for="access_token" class="form-label">Access Token</label>
+              <textarea type="text" class="form-control" name="access_token" id="access_token" style="height: 150px;"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-success">Save Integration</button>
+            <a href="{% url 'social:begin' 'facebook' %}" class="btn btn-primary" id="conn_fb_btn">
+                Connect Facebook
+            </a>
+          </form>
+        </div>
+      </div>
+
+      <div class="card mt-4 shadow-sm">
+        <div class="card-header bg-secondary text-white">
+          <h5 class="mb-0">Current Integrations</h5>
+        </div>
+        <div class="card-body">
+          {% if integrations %}
+            <ul class="list-group list-group-flush">
+              {% for integration in integrations %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <span><strong>{{ integration.platform|title }}</strong></span>
+                  <span class="badge {% if integration.is_enabled %}bg-success{% else %}bg-danger{% endif %}">
+                    {% if integration.is_enabled %}Enabled{% else %}Disabled{% endif %}
+                  </span>
+                  {% if integration.platform == "facebook" and integration.access_token %}
+                    <small class="text-muted">Access Token: {{ integration.access_token|truncatechars:20 }}</small>
+                  {% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted">No integrations found.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script id="integration-data" type="application/json">
+  {{ integrations_json|safe }}
+</script>
+
+<script>
+  const integrations = JSON.parse(document.getElementById("integration-data").textContent);
+  const fbBtn = document.getElementById('conn_fb_btn');
+
+  if(integrations) {
+    integrations.forEach(integration => {
+      if (integration.platform === 'facebook') {
+        document.getElementById('api_key').value = integration.api_key || '';
+        document.getElementById('access_token').value = integration?.access_token || '';
+        document.getElementById('api_secret').value = integration.api_secret || '';
+        document.getElementById('is_enabled').checked = integration.is_enabled || false;
+
+        if (integration?.access_token) {
+          fbBtn.classList.add('disabled');
+          fbBtn.style.pointerEvents = 'none';
+          fbBtn.style.opacity = '0.6';
+          fbBtn.title = 'Already connected';
+          fbBtn.textContent = 'Already connected'; // Change button text
+        }
+      }
+    });
+  }
+  document.getElementById("platform").addEventListener("change", function () {
+    const platform = this.value ?? 'facebook';
+    const selected = integrations.find(i => i.platform === platform);
+    document.getElementById('is_enabled').checked = selected?.is_enabled || false;
+    document.getElementById('api_key').value = selected?.api_key || '';
+    document.getElementById('api_secret').value = selected?.api_secret || '';
+    document.getElementById('access_token').value = selected?.access_token || '';
+
+    if (selected?.access_token) {
+      fbBtn.classList.add('disabled');
+      fbBtn.style.pointerEvents = 'none';
+      fbBtn.style.opacity = '0.6';
+      fbBtn.title = 'Already connected';
+      fbBtn.textContent = 'Already connected'; // Change button text
+    } else {
+      console.log('hit');
+      fbBtn.classList.remove('disabled');
+      fbBtn.style.opacity = '1';
+      fbBtn.style.pointerEvents = 'auto';
+      fbBtn.textContent = 'Connect Facebook'; // Default button text
+    }
+  });
+</script>
+{% endblock %}

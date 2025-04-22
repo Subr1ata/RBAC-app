@@ -32,7 +32,7 @@
             <div class="text-truncate" data-i18n="Analytics">Analytics</div>
           </a>
         </li>
-        <li class="menu-item">
+        {% comment %} <li class="menu-item">
           <a href="{% get_theme_variables 'live_preview' %}dashboard/crm/" class="menu-link" target="_blank">
             <div class="text-truncate" data-i18n="CRM">CRM</div>
             <span class="badge bg-label-primary fs-tiny rounded-pill ms-auto">PRO</span>
@@ -55,11 +55,11 @@
             <div class="text-truncate" data-i18n="Academy">Academy</div>
             <span class="badge bg-label-primary fs-tiny rounded-pill ms-auto">PRO</span>
           </a>
-        </li>
+        </li> {% endcomment %}
       </ul>
     </li>
     <!-- Layouts -->
-    <li class="menu-item {% if '/layouts/' in request.path  %}active open{% endif %}">
+    {% comment %} <li class="menu-item {% if '/layouts/' in request.path  %}active open{% endif %}">
       <a href="javascript:void(0);" class="menu-link menu-toggle">
         <i class="menu-icon tf-icons bx bx-layout"></i>
         <div class="text-truncate" data-i18n="Layouts">Layouts</div>
@@ -91,9 +91,10 @@
           </a>
         </li>
       </ul>
-    </li>
+    </li> {% endcomment %}
+
     <!-- Front Pages -->
-    <li class="menu-item">
+    {% comment %} <li class="menu-item">
       <a href="javascript:void(0);" class="menu-link menu-toggle">
         <i class='menu-icon tf-icons bx bx-store'></i>
         <div class="text-truncate" data-i18n="Front Pages">Front Pages</div>
@@ -126,21 +127,21 @@
           </a>
         </li>
       </ul>
-    </li>
+    </li> {% endcomment %}
 
-    <li class="menu-item">
+    {% comment %} <li class="menu-item">
       <a href="{% get_theme_variables 'live_preview' %}transactions/list/" class="menu-link" target="_blank">
         <i class="menu-icon tf-icons bx bx-data"></i>
         <div class="text-truncate" data-i18n="Transactions (CRUD)">Transactions (CRUD)</div>
         <span class="badge bg-label-primary fs-tiny rounded-pill ms-auto">PRO</span>
       </a>
-    </li>
+    </li> {% endcomment %}
 
     <li class="menu-header small text-uppercase">
       <span class="menu-header-text">Apps & Pages</span>
     </li>
 
-    <li class="menu-item">
+    {% comment %} <li class="menu-item">
       <a href="{% get_theme_variables 'live_preview' %}app/email/" class="menu-link" target="_blank">
         <i class="menu-icon tf-icons bx bx-envelope"></i>
         <div class="text-truncate" data-i18n="Email">Email</div>
@@ -167,7 +168,40 @@
         <div class="text-truncate" data-i18n="Kanban">Kanban</div>
         <span class="badge bg-label-primary fs-tiny rounded-pill ms-auto">PRO</span>
       </a>
+    </li> {% endcomment %}
+
+    {% comment %} Users {% endcomment %}
+    <li class="menu-item {% if '/users/' in request.path %}active open{% endif %}">
+      {% if perms.users.view_customuser %}
+        <a href="javascript:void(0);" class="menu-link menu-toggle">
+          <i class="menu-icon tf-icons bx bx-user-circle"></i>
+          <div class="text-truncate" data-i18n="Users">Users</div>
+        </a>
+      {% endif %}
+      <ul class="menu-sub">
+        <li class="menu-item {% if '/list/' in request.path %}active{% endif %}">
+          <a href="{% url 'view_users' %}" class="menu-link">
+            <div class="text-truncate" data-i18n="List">List</div>
+          </a>
+        </li>
+        {% comment %} <li class="menu-item {% if '/notifications/' in request.path %}active{% endif %}">
+          <a href="{% url 'pages-account-settings-notifications' %}" class="menu-link">
+            <div class="text-truncate" data-i18n="Notifications">Notifications</div>
+          </a>
+        </li>
+        <li class="menu-item {% if '/connections/' in request.path %}active{% endif %}">
+          <a href="{% url 'pages-account-settings-connections' %}" class="menu-link">
+            <div class="text-truncate" data-i18n="Connections">Connections</div>
+          </a>
+        </li>
+        <li class="menu-item {% if '/social_media_settings/' in request.path %}active{% endif %}">
+          <a href="{% url 'socia-media-settings' %}" class="menu-link">
+            <div class="text-truncate" data-i18n="socia media settings">socia media settings</div>
+          </a>
+        </li> {% endcomment %}
+      </ul>
     </li>
+
     <!-- Account -->
     <li class="menu-item {% if '/account_settings/' in request.path %}active open{% endif %}">
       <a href="javascript:void(0);" class="menu-link menu-toggle">
@@ -190,6 +224,11 @@
             <div class="text-truncate" data-i18n="Connections">Connections</div>
           </a>
         </li>
+        <li class="menu-item {% if '/social_media_settings/' in request.path %}active{% endif %}">
+          <a href="{% url 'socia-media-settings' %}" class="menu-link">
+            <div class="text-truncate" data-i18n="socia media settings">social media settings</div>
+          </a>
+        </li>
       </ul>
     </li>
     <!-- Auth -->
@@ -199,7 +238,7 @@
         <div class="text-truncate" data-i18n="Authentications">Authentications</div>
       </a>
       <ul class="menu-sub">
-        <li class="menu-item {% if '/login/' in request.path %}active{% endif %}">
+        {% comment %} <li class="menu-item {% if '/login/' in request.path %}active{% endif %}">
           <a href="{% url 'auth-login-basic' %}" class="menu-link" target="_blank">
             <div class="text-truncate" data-i18n="Login">Login</div>
           </a>
@@ -213,11 +252,18 @@
           <a href="{% url 'auth-forgot-password-basic' %}" class="menu-link" target="_blank">
             <div class="text-truncate" data-i18n="Frogot Password">Frogot Password</div>
           </a>
+        </li> {% endcomment %}
+        {% comment %} Roles & Permission {% endcomment %}
+        <li class="menu-item {% if '/view-roles/' in request.path %}active{% endif %}">
+          <a href="{% url 'view-roles' %}" class="menu-link">
+            <div class="text-truncate" data-i18n="Roles & Permission">Roles & Permission</div>
+          </a>
         </li>
       </ul>
     </li>
     <!-- Misc -->
-    <li class="menu-item {% if '/misc/' in request.path %}active open{% endif %}">
+
+    {% comment %} <li class="menu-item {% if '/misc/' in request.path %}active open{% endif %}">
       <a href="javascript:void(0);" class="menu-link menu-toggle">
         <i class="menu-icon tf-icons bx bx-cube-alt"></i>
         <div class="text-truncate" data-i18n="Misc">Misc</div>
@@ -234,9 +280,9 @@
           </a>
         </li>
       </ul>
-    </li>
+    </li> {% endcomment %}
 
-    <li class="menu-header small text-uppercase">
+    {% comment %} <li class="menu-header small text-uppercase">
       <span class="menu-header-text">Components</span>
     </li>
 
@@ -375,7 +421,7 @@
         <i class="menu-icon tf-icons bx bx-crown"></i>
         <div class="text-truncate" data-i18n="Boxicons">Boxicons</div>
       </a>
-    </li>
+    </li> {% endcomment %}
 
     <li class="menu-header small text-uppercase">
       <span class="menu-header-text">Forms & Tables</span>
@@ -443,7 +489,7 @@
       </a>
     </li>
 
-    <li class="menu-header small text-uppercase">
+    {% comment %} <li class="menu-header small text-uppercase">
       <span class="menu-header-text">Misc</span>
     </li>
 
@@ -458,7 +504,7 @@
         <i class="menu-icon tf-icons bx bx-file"></i>
         <div class="text-truncate" data-i18n="Documentation">Documentation</div>
       </a>
-    </li>
+    </li> {% endcomment %}
 
   </ul>
 
