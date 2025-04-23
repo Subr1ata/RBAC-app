@@ -9,6 +9,8 @@ from .models import Role
 from config.decorators import unauthenticated_user
 from django.contrib.auth.models import Permission
 from collections import defaultdict
+from django.views.decorators.csrf import csrf_protect
+from django.contrib.contenttypes.models import ContentType
 
 """
 This file is a view controller for multiple pages as a module.
@@ -247,3 +249,54 @@ class AuthView(TemplateView):
         context = TemplateLayout().init(context)
 
         return render(request, template_name, context)
+
+    @csrf_protect
+    def list_create_delete_permissions(request):
+        if request.method == "POST":
+            if "perm_id" in request.POST:  # Handle deletion
+                perm_id = request.POST.get("perm_id")
+                try:
+                    perm = Permission.objects.get(id=perm_id)
+                    perm.delete()
+                    messages.success(request, f"Permission '{perm.name}' deleted successfully.")
+                except Permission.DoesNotExist:
+                    messages.error(request, "Permission not found.")
+                return redirect("list-permissions")
+
+            elif "codename" in request.POST:  # Handle creation
+                name = request.POST.get("name")
+                codename = request.POST.get("codename")
+                app_label = request.POST.get("app_label")
+                model = request.POST.get("model")
+
+                try:
+                    content_type = ContentType.objects.get(app_label=app_label, model=model)
+                    if Permission.objects.filter(codename=codename).exists():
+                        messages.warning(request, f"A permission with codename '{codename}' already exists.")
+                    else:
+                        Permission.objects.create(
+                            codename=codename,
+                            name=name,
+                            content_type=content_type
+                        )
+                        messages.success(request, f"Permission '{name}' created successfully.")
+                except ContentType.DoesNotExist:
+                    messages.error(request, "Invalid app label or model name.")
+
+                return redirect("list-permissions")
+
+        excluded_apps = ['auth', 'admin', 'sessions', 'contenttypes', 'social_django']
+        permissions = Permission.objects.exclude(
+            content_type__app_label__in=excluded_apps
+        ).order_by('content_type__app_label', 'content_type__model', 'codename')
+
+        content_types = ContentType.objects.exclude(app_label__in=excluded_apps)
+
+        context = {
+            "permissions": permissions,
+            "content_types": content_types,
+        }
+
+        context = TemplateLayout().init(context)
+
+        return render(request, "permissions/list_permissions.html", context)

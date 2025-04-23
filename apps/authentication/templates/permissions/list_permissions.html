@@ -1,0 +1,209 @@
+{% extends layout_path %}
+{% load static %}
+{% block content %}
+
+<h2>All Custom Permissions</h2>
+
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+
+<div class="card">
+  <div class="card-datatable table-responsive">
+    <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+      <div class="row">
+        <div class="col-md-2">
+          <div class="me-3">
+            <div class="dataTables_length" id="DataTables_Table_0_length">
+              <label>
+                <select id="custom-length-menu" name="DataTables_Table_0_length" aria-controls="DataTables_Table_0" class="form-select mx-0">
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-10">
+          <div class="dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-6 mb-md-0 mt-n6 mt-md-0 gap-md-5">
+            <div id="DataTables_Table_0_filter" class="dataTables_filter">
+              <label>
+                <input id="custom-search-input" type="search" class="form-control ms-0" placeholder="Search.." aria-controls="DataTables_Table_0">
+              </label>
+            </div>
+            <div class="dt-buttons btn-group flex-wrap">
+              <div class="btn-group">
+                <button class="btn btn-secondary buttons-collection dropdown-toggle btn-label-secondary me-5" tabindex="0" aria-controls="DataTables_Table_0" type="button" aria-haspopup="dialog" aria-expanded="false">
+                  <span>
+                    <i class="bx bx-export me-2 bx-sm"></i>Export </span>
+                </button>
+              </div>
+              <button class="btn btn-secondary add-new btn-primary" tabindex="0" aria-controls="DataTables_Table_0" type="button">
+                <span>
+                  <i class="bx bx-plus bx-sm me-0 me-sm-2"></i>
+                  <span class="d-none d-sm-inline-block">Add Transaction</span>
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <table class="datatables-transaction table dataTable no-footer dtr-column" id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info">
+        <thead class="border-top">
+          <tr class="text-nowrap">
+            {% comment %} <th class="control sorting_disabled dtr-hidden" rowspan="1" colspan="1" style="width: 4.15714px; display: none;" aria-label=""></th> {% endcomment %}
+            <th class="sorting sorting_desc" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" style="width: 18.4px;" aria-sort="descending" aria-label="Id: activate to sort column ascending">#</th>
+            <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" style="width: 110.257px;" aria-label="Customer: activate to sort column ascending">App</th>
+            <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" style="width: 147.657px;" aria-label="Transaction Date: activate to sort column ascending">Model</th>
+            <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" style="width: 112.929px;" aria-label="Due Date: activate to sort column ascending">Codename</th>
+            <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" style="width: 65.9px;" aria-label="Total: activate to sort column ascending">Name</th>
+
+            <th class="sorting_disabled" rowspan="1" colspan="1" style="width: 94.0571px;" aria-label="Actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for perm in permissions %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ perm.content_type.app_label }}</td>
+              <td>{{ perm.content_type.model }}</td>
+              <td>{{ perm.codename }}</td>
+              <td>{{ perm.name }}</td>
+              <td>
+                {% if perms.authentication.delete_role %}
+                  <form method="post" onsubmit="return confirm('Are you sure you want to delete this permission?');">
+                    {% csrf_token %}
+                    <input type="hidden" name="perm_id" value="{{ perm.id }}">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                  </form>
+                {% else %}
+                  &nbsp;
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="row">
+        <div class="col-sm-12 col-md-6">
+          <div class="dataTables_info" role="status" aria-live="polite" id="custom-table-info">Showing 1 to 7 of 7 entries</div>
+        </div>
+        <div class="col-sm-12 col-md-6">
+          <div class="dataTables_paginate paging_simple_numbers" id="DataTables_Table_0_paginate">
+            <ul class="pagination">
+
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<a href="{% url 'view-roles' %}" class="btn btn-secondary mt-3">Back to Roles</a>
+
+<style>
+.dt-search,.dt-info,.dt-paging{
+  display: none !important;
+}
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+
+  $(document).ready(function() {
+    var table = $('#DataTables_Table_0').DataTable({
+      pageLength: 10,
+      lengthMenu: [10, 25, 50, 100],
+      order: [[0, 'asc']],
+      language: {
+        search: "", // Disable the default search input
+        lengthMenu: "" // Disable the default length menu text
+      },
+      dom: 't<"row mb-3"<"col-sm-6"f>>ip', // Remove the default length menu
+      paging: true, // Disable default pagination
+      searching: true, // Disable default searching
+      drawCallback: function () {
+        var info = this.api().page.info();
+        var from = info.start + 1;
+        var to = info.end;
+        var total = info.recordsDisplay;
+
+        $('#custom-table-info').html(`Showing ${from} to ${to} of ${total} entries`);
+        updateCustomPagination(this.api());
+      }
+    });
+
+    // Bind the custom dropdown to the DataTable
+    $('#custom-length-menu').on('change', function() {
+      var length = $(this).val();
+      table.page.len(length).draw();
+      updateCustomPagination(table);
+    });
+
+    // Bind the custom search input to the DataTable
+    $('#custom-search-input').on('keyup', function() {
+      table.search($(this).val()).draw();
+    });
+
+    // Custom pagination logic
+    function updateCustomPagination(table) {
+      var info = table.page.info();
+      var currentPage = info.page + 1;
+      var totalPages = info.pages;
+
+      // Update the custom pagination controls
+      $('#DataTables_Table_0_paginate .pagination').html('');
+
+      // Previous button
+      var prevDisabled = currentPage === 1 ? 'disabled' : '';
+      $('#DataTables_Table_0_paginate .pagination').append(`
+        <li class="paginate_button page-item previous ${prevDisabled}">
+          <a href="#" class="page-link" data-dt-idx="${currentPage - 1}">
+            <i class="bx bx-chevron-left bx-18px"></i>
+          </a>
+        </li>
+      `);
+
+      // Page numbers
+      for (var i = 1; i <= totalPages; i++) {
+        var activeClass = i === currentPage ? 'active' : '';
+        $('#DataTables_Table_0_paginate .pagination').append(`
+          <li class="paginate_button page-item ${activeClass}">
+            <a href="#" class="page-link" data-dt-idx="${i - 1}">${i}</a>
+          </li>
+        `);
+      }
+
+      // Next button
+      var nextDisabled = currentPage === totalPages ? 'disabled' : '';
+      $('#DataTables_Table_0_paginate .pagination').append(`
+        <li class="paginate_button page-item next ${nextDisabled}">
+          <a href="#" class="page-link" data-dt-idx="${currentPage}">
+            <i class="bx bx-chevron-right bx-18px"></i>
+          </a>
+        </li>
+      `);
+    }
+
+    // Handle custom pagination clicks
+    $('#DataTables_Table_0_paginate').on('click', '.page-link', function(e) {
+      e.preventDefault();
+      var pageIndex = $(this).data('dt-idx');
+      if (pageIndex !== undefined) {
+        table.page(pageIndex).draw(false);
+        updateCustomPagination(table);
+      }
+    });
+
+    // Initialize custom pagination
+    updateCustomPagination(table);
+  });
+</script>
+
+{% endblock %}

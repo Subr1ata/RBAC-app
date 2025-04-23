@@ -256,9 +256,17 @@
         {% comment %} Roles & Permission {% endcomment %}
         <li class="menu-item {% if '/view-roles/' in request.path %}active{% endif %}">
           <a href="{% url 'view-roles' %}" class="menu-link">
-            <div class="text-truncate" data-i18n="Roles & Permission">Roles & Permission</div>
+            <div class="text-truncate" data-i18n="Roles & Permission">Roles</div>
           </a>
         </li>
+
+        {% if perms.authentication.view_role %}
+          <li class="menu-item {% if '/list-permissions/' in request.path or '/view-permissions' in request.path %}active{% endif %}">
+            <a href="{% url 'list-permissions' %}" class="menu-link">
+              <div class="text-truncate" data-i18n="Roles & Permission">Permissions</div>
+            </a>
+          </li>
+        {% endif %}
       </ul>
     </li>
     <!-- Misc -->

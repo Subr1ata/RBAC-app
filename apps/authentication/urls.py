@@ -21,6 +21,7 @@ urlpatterns = [
     ),
     path("auth/logout/", AuthView.logout_view, name="auth-logout"),  # Add this line for logout
 
+    path("auth/list-permissions/", AuthView.list_create_delete_permissions, name="list-permissions"),
     path("auth/view-permissions/<int:role_id>/", AuthView.manage_permissions, name="view-permissions"),
     path("auth/view-roles/", AuthView.as_view(template_name="roles-permission/view_roles.html"), name="view-roles"),
     path("auth/create-role/", AuthView.as_view(), name="create-role"),

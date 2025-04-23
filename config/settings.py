@@ -32,6 +32,13 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Default session engine
 SESSION_COOKIE_AGE = 3600  # Time in seconds before the session expires (1 hour)
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Keep session alive even when browser is closed
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://marketing.galla.app",
+    "https://www.marketing.galla.app",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", 'True').lower() in ['true', 'yes', '1']
 
