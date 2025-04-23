@@ -23,9 +23,9 @@ urlpatterns = [
 
     path("auth/list-permissions/", AuthView.list_create_delete_permissions, name="list-permissions"),
     path("auth/view-permissions/<int:role_id>/", AuthView.manage_permissions, name="view-permissions"),
-    path("auth/view-roles/", AuthView.as_view(template_name="roles-permission/view_roles.html"), name="view-roles"),
+    path("auth/roles/view/", AuthView.as_view(template_name="roles-permission/view_roles.html"), name="view-roles"),
     path("auth/create-role/", AuthView.as_view(), name="create-role"),
     path("auth/manage-roles/", AuthView.manage_roles, name="manage-roles"),
     path("auth/delete-role/<int:role_id>/", AuthView.delete_role, name="delete-role"),
-    path("auth/edit-role/<int:role_id>/", AuthView.manage_permissions, name="edit-role"),  # Add this for editing roles
+    path("auth/roles/edit/<int:role_id>/", AuthView.manage_permissions, name="edit-role"),  # Add this for editing roles
 ]
