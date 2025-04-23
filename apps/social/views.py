@@ -1,14 +1,14 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from .models import SocialMediaIntegration
 from django.views.generic import TemplateView
 from web_project import TemplateLayout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from social_django.models import UserSocialAuth
-from django.utils.safestring import mark_safe
+# from django.utils.safestring import mark_safe
 import json
 from django.core.serializers.json import DjangoJSONEncoder
-from config.context_processors import facebook_credentials
+# from config.context_processors import facebook_credentials
 
 """
 This file is a view controller for multiple pages as a module.
@@ -54,17 +54,6 @@ class SocialView(TemplateView):
         context['integrations'] = SocialMediaIntegration.objects.all()
         context['integrations_json'] = integrations_json
         return context
-
-    # def get(self, request):
-    #     integrations_qs = SocialMediaIntegration.objects.all()
-
-    #     integrations = list(integrations_qs.values())  # ✅ Convert to list of dicts
-    #     integrations_json = mark_safe(json.dumps(integrations))
-
-    #     return render(request, 'social_media_settings.html', {
-    #         'integrations': integrations_qs,
-    #         'integrations_json': integrations_json,
-    #     })
 
     # Handle POST requests
     def post(self, request, *args, **kwargs):
