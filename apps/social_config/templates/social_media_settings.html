@@ -170,10 +170,10 @@
         if (integration.platform === 'facebook') {
           apiKeyInput.value = integration.api_key || '';
           apiSecretInput.value = integration.api_secret || '';
-          accessTokenInput.value = integration.access_token || '';
+          accessTokenInput.value = integration?.social_user_details?.user_info?.access_token || '';
           isEnabledCheckbox.checked = integration.is_enabled || false;
           // Disable the "Connect Facebook" button if Access Token is already present
-          if (integration.access_token) {
+          if (integration?.social_user_details?.user_info?.access_token) {
             fbBtn.classList.add('disabled');
             fbBtn.style.pointerEvents = 'none';
             fbBtn.style.opacity = '0.6';
@@ -197,6 +197,7 @@
       const platform = this.value ?? 'facebook';
       const selected = integrations.find(i => i.platform === platform);
 
+      console.log('selected---> ' ,selected);
       apiKeyInput.value = selected?.api_key || '';
       apiSecretInput.value = selected?.api_secret || '';
       accessTokenInput.value = selected?.access_token || '';

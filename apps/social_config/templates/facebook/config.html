@@ -75,8 +75,8 @@
                 <span class="badge {% if integration.is_enabled %}bg-success{% else %}bg-danger{% endif %}">
                   {% if integration.is_enabled %}Enabled{% else %}Disabled{% endif %}
                 </span>
-                {% if integration.platform == "facebook" and integration.access_token %}
-                  <small class="text-muted">Access Token: {{ integration.access_token|truncatechars:20 }}</small>
+                {% if integration.platform == "facebook" and integration.social_user_details.user_info.access_token %}
+                  <small class="text-muted">Access Token: {{ integration.social_user_details.user_info.access_token|truncatechars:20 }}</small>
                 {% endif %}
               </li>
             {% endfor %}
@@ -90,29 +90,7 @@
 </div>
 
 {% comment %} <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const apiKeyInput = document.getElementById('api_key');
-    const apiSecretInput = document.getElementById('api_secret');
-    const connectButton = document.getElementById('conn_fb_btn');
-
-    function validateFields() {
-      const apiKey = apiKeyInput.value.trim();
-      const apiSecret = apiSecretInput.value.trim();
-
-      if (apiKey && apiSecret) {
-        connectButton.classList.remove('disabled');
-        connectButton.style.pointerEvents = 'auto';
-      } else {
-        connectButton.classList.add('disabled');
-        connectButton.style.pointerEvents = 'none';
-      }
-    }
-
-    // Validate fields on page load
-    validateFields();
-
-    // Add event listeners to validate fields when inputs change
-    apiKeyInput.addEventListener('input', validateFields);
-    apiSecretInput.addEventListener('input', validateFields);
-  })
+  // Pretty-print it inside the textarea using JS
+  const jsonData = JSON.parse(document.getElementById('access_token_json').textContent);
+  document.getElementById('access_token').value = JSON.stringify(jsonData, null, 2);
 </script> {% endcomment %}

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import FacebookManageView
+from apps.marketing.views.facebook import FacebookManageView
 
 # app_name = "marketing"
 

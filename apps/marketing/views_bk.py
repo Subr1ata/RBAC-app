@@ -39,15 +39,16 @@ class FacebookManageView(TemplateView):
 
         # Fetch Facebook integration details
         facebook_integration = SocialMediaIntegration.objects.filter(platform="facebook").first()
-        if not facebook_integration or not facebook_integration.access_token:
+        if not facebook_integration or not facebook_integration.page_access_token:
             messages.error(self.request, "Please connect to Facebook and select a page first.")
             return context
 
         # Fetch Facebook page feeds and profile picture
-        page_access_token = facebook_integration.access_token
+        page_access_token = facebook_integration.page_access_token
+        user_access_token = facebook_integration.access_token
 
-        user_info_url = f"https://graph.facebook.com/me?access_token={page_access_token}"
-        user_profile_pic_url = f"https://graph.facebook.com/me/picture?type=large&redirect=false&access_token={page_access_token}"
+        user_info_url = f"https://graph.facebook.com/me?access_token={user_access_token}"
+        user_profile_pic_url = f"https://graph.facebook.com/me/picture?type=large&redirect=false&access_token={user_access_token}"
 
         try:
             # Fetch user info
@@ -164,6 +165,7 @@ class FacebookManageView(TemplateView):
 
             # Save selected page to the database
             facebook_integration.page_id = page_id
+            facebook_integration.page_access_token = access_token
             # facebook_integration.page_name = page_details.get("name")
             # facebook_integration.page_image_url = page_details.get("picture", {}).get("data", {}).get("url")
             facebook_integration.save()

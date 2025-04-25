@@ -1,5 +1,6 @@
 {% extends layout_path %}
 {% load static %}
+{% block title %}Permissions - Authentications{% endblock %}
 {% block content %}
 
 <h2>All Custom Permissions</h2>
@@ -80,7 +81,8 @@
               <td>{{ perm.codename }}</td>
               <td>{{ perm.name }}</td>
               <td>
-                {% if perms.authentication.delete_role %}
+                &nbsp;
+                {% comment %} {% if perms.authentication.delete_role %}
                   <form method="post" onsubmit="return confirm('Are you sure you want to delete this permission?');">
                     {% csrf_token %}
                     <input type="hidden" name="perm_id" value="{{ perm.id }}">
@@ -88,7 +90,7 @@
                   </form>
                 {% else %}
                   &nbsp;
-                {% endif %}
+                {% endif %} {% endcomment %}
               </td>
             </tr>
           {% endfor %}

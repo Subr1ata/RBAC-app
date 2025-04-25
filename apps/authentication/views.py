@@ -128,7 +128,7 @@ class AuthView(TemplateView):
         context = {
             'form': form,
             'grouped_permissions': grouped_permissions_list,
-            'permission_actions': ['add', 'change', 'delete', 'view'],
+            'permission_actions': ['add', 'edit', 'delete', 'view'],
             "roles": roles,
             'assigned_permission_ids': assigned_permission_ids,  # Pass assigned permission IDs
         }

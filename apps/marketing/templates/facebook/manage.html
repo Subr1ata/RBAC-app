@@ -19,7 +19,7 @@
           <p class="text-muted mb-0">Connect your Facebook account to schedule and manage posts.</p>
         </div>
         <div>
-          {% if fb_user.user_info %}
+          {% if fb_user.name %}
             <span class="badge bg-label-success"><i class="bx bx-check-circle me-1"></i> Connected</span>
           {% else %}
             <span class="badge bg-label-warning"><i class="bx bx-error-circle me-1"></i> Not Connected</span>
@@ -31,15 +31,18 @@
       <div class="d-flex align-items-center mb-4">
         <div class="flex-grow-1">
           <p class="mb-1 fw-semibold">Facebook Account</p>
-          {% if fb_user.user_info %}
-            <p class="text-muted mb-0">{{ fb_user.user_info.name }}</p>
+          {% if fb_user.name %}
+            <div class="d-flex align-items-center">
+              <img src="{{ fb_user.img }}" class="rounded-circle me-2" width="30" height="30" alt="Profile">
+              <p class="text-muted mb-0">{{ fb_user.name }}</p>
+            </div>
           {% else %}
             <p class="text-muted mb-0">No account connected</p>
           {% endif %}
         </div>
         <button class="btn btn-primary" id="connectBtn">
           <i class="bx bxl-facebook me-1"></i>
-          {% if integration.connected %}Reconnect{% else %}Connect{% endif %}
+          {% if fb_user.name %}Reconnect{% else %}Connect{% endif %}
         </button>
       </div>
 

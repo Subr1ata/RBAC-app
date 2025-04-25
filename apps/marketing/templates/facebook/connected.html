@@ -2,7 +2,7 @@
 <div class="container-xxl flex-grow-1 container-p-y">
 
   <!-- Profile Section -->
-  <div class="card mb-4">
+  {% comment %} <div class="card mb-4">
     <div class="card-body d-flex align-items-center">
       <img src="{{ fb_user.picture }}" class="rounded-circle me-3" width="60" height="60" alt="Profile">
       <div>
@@ -10,16 +10,68 @@
         <p class="mb-0 text-muted">Connected to Facebook</p>
       </div>
     </div>
-  </div>
+  </div> {% endcomment %}
 
   <!-- Trigger Page/Group Modal -->
-  <div class="card">
+  <div class="card" id="selectedPage">
     <div class="card-body text-center">
       <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pageGroupModal">
         <i class="bx bxl-facebook me-1"></i> Choose Page or Group
       </button>
     </div>
   </div>
+
+  <!-- Sneat Bootstrap 5 Admin Template - Custom Modal/Action UI with SVGs -->
+
+  <div class="container-xxl flex-grow-1 container-p-y">
+  <!-- Page Feeds Section -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="card-title mb-0">📄 Page Feeds</h5>
+    </div>
+
+    <div class="card-body">
+      {% for page in fb_user.all_pages %}
+        <div class="mb-5 border-bottom pb-4">
+          <!-- Page Info -->
+          <div class="d-flex align-items-center mb-3">
+            <img src="{{ page.img }}" class="rounded-circle me-3 border border-2" width="60" height="60" alt="Page Image">
+            <div>
+              <h6 class="mb-0">{{ page.name }}</h6>
+              <span class="badge bg-label-primary">Active Page</span>
+            </div>
+          </div>
+
+          <!-- Feeds -->
+          <div class="row">
+            {% for feed in page.feeds %}
+              <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm mb-4 h-100">
+                  <div class="card-body">
+                    <p class="mb-2"><strong>📝 Message:</strong> {{ feed.message|default:"No message" }}</p>
+                    <p class="text-muted small mb-3"><i class="bx bx-time-five"></i> {{ feed.created_time }}</p>
+
+                    <!-- Feed Image -->
+                    {% if feed.attachments and feed.attachments.data %}
+                      {% for attachment in feed.attachments.data %}
+                        {% if attachment.media and attachment.media.image %}
+                          <img src="{{ attachment.media.image.src }}" class="img-fluid rounded mb-2" alt="Feed Image">
+                        {% endif %}
+                      {% endfor %}
+                    {% elif feed.full_picture %}
+                      <img src="{{ feed.full_picture }}" class="img-fluid rounded mb-2" alt="Feed Image">
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
 
   <!-- Modal: Page/Group Selector -->
   <div class="modal fade" id="pageGroupModal" tabindex="-1" aria-labelledby="pageGroupModalLabel" aria-hidden="true">
@@ -35,13 +87,12 @@
           <div class="row mb-4">
             <div class="col-md-6">
               <h6 class="mb-3">Your Pages</h6>
-              {% for page in fb_user.account %}
-              <div class="card card-body mb-2">
+              {% for page in fb_user.all_pages %}
+              <div class="card card-body mb-2" >
                 <div class="d-flex align-items-center">
-                  <img src="{{ page.page_image_url }}" class="rounded-circle me-3" width="60" height="60" alt="Profile">
+                  <img src="{{ page.img }}" class="rounded-circle me-3" width="60" height="60" alt="Profile">
                   <div class="align-items-center">
                     <h6 class="mb-1">{{ page.name }}</h6>
-                    {% comment %} <p class="mb-0 text-muted">Connected to Facebook</p> {% endcomment %}
                     <button class="btn btn-outline-primary btn-sm" onclick="selectPage('{{ page.id }}', '{{ page.access_token }}')">Select</button>
                   </div>
                 </div>

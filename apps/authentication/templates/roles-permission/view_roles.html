@@ -16,7 +16,7 @@
         {% comment %} {% csrf_token %} {% endcomment %}
         {% comment %} {{ form.as_p }} {% endcomment %}
     {% comment %} </form> {% endcomment %}
-    <a class="btn btn-primary m-2" href="/auth/manage-roles">Create Role</a>
+    <a class="btn btn-primary m-2" href="{% url 'manage-roles' %}">Create Role</a>
 
     {% if messages %}
       {% for message in messages %}
