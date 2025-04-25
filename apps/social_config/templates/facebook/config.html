@@ -1,0 +1,118 @@
+<div class="row">
+  <div class="col-md-8 offset-md-2">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Facebook Integrations</h5>
+      </div>
+      {% if messages %}
+        <div class="alert alert-success">
+          {% for message in messages %}
+            {{ message }}
+          {% endfor %}
+        </div>
+      {% endif %}
+      <div class="card-body">
+        <form method="POST">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="platform" class="form-label">Platform</label>
+            <select name="platform" id="platform" class="form-select" required>
+              <option value="facebook">Facebook</option>
+              <option value="instagram">Instagram</option>
+            </select>
+          </div>
+
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="is_enabled" name="is_enabled">
+            <label class="form-check-label" for="is_enabled">Enable</label>
+          </div>
+
+          <div class="mb-3">
+            <label for="api_key" class="form-label">API Key</label>
+            <input type="text" class="form-control" name="api_key" id="api_key" value="{{ api_key }}" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="api_secret" class="form-label">API Secret</label>
+            <input type="text" class="form-control" name="api_secret" id="api_secret" value="{{ api_secret }}" required>
+          </div>
+
+          <!-- Warning Message -->
+          {% if not api_key or not api_secret %}
+            <div class="alert alert-warning" role="alert">
+              Please enter and save the API Key and API Secret before connecting to Facebook.
+            </div>
+          {% endif %}
+
+          <!-- Access Token Field (Hidden if API Key and Secret are missing) -->
+          {% if api_key and api_secret %}
+            <div class="mb-3">
+              <label for="access_token" class="form-label">Access Token</label>
+              <textarea class="form-control" name="access_token" id="access_token" style="height: 150px;" readonly>{{ access_token }}</textarea>
+            </div>
+          {% endif %}
+
+          <button type="submit" class="btn btn-success">Save API Key and Secret</button>
+
+          <!-- Connect Facebook Button -->
+          <a href="{% url 'social:begin' 'facebook' %}" class="btn btn-primary {% if not api_key or not api_secret %}disabled{% endif %}" id="conn_fb_btn">
+              Connect Facebook
+          </a>
+        </form>
+      </div>
+    </div>
+
+    <div class="card mt-4 shadow-sm">
+      <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0">Current Integrations</h5>
+      </div>
+      <div class="card-body">
+        {% if integrations %}
+          <ul class="list-group list-group-flush">
+            {% for integration in integrations %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span><strong>{{ integration.platform|title }}</strong></span>
+                <span class="badge {% if integration.is_enabled %}bg-success{% else %}bg-danger{% endif %}">
+                  {% if integration.is_enabled %}Enabled{% else %}Disabled{% endif %}
+                </span>
+                {% if integration.platform == "facebook" and integration.access_token %}
+                  <small class="text-muted">Access Token: {{ integration.access_token|truncatechars:20 }}</small>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted">No integrations found.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% comment %} <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const apiKeyInput = document.getElementById('api_key');
+    const apiSecretInput = document.getElementById('api_secret');
+    const connectButton = document.getElementById('conn_fb_btn');
+
+    function validateFields() {
+      const apiKey = apiKeyInput.value.trim();
+      const apiSecret = apiSecretInput.value.trim();
+
+      if (apiKey && apiSecret) {
+        connectButton.classList.remove('disabled');
+        connectButton.style.pointerEvents = 'auto';
+      } else {
+        connectButton.classList.add('disabled');
+        connectButton.style.pointerEvents = 'none';
+      }
+    }
+
+    // Validate fields on page load
+    validateFields();
+
+    // Add event listeners to validate fields when inputs change
+    apiKeyInput.addEventListener('input', validateFields);
+    apiSecretInput.addEventListener('input', validateFields);
+  })
+</script> {% endcomment %}

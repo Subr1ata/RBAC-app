@@ -58,10 +58,13 @@ urlpatterns = [
     path("", include("apps.tables.urls")),
 
     # Social urls
-    path("", include("apps.social.urls")),
+    path("", include("apps.social_config.urls")),
 
     # Users urls
     path("", include("apps.users.urls")),
+
+    # Marketing urls
+    path("", include("apps.marketing.urls")),
 ]
 
 handler404 = SystemView.as_view(template_name="pages_misc_error.html", status=404)

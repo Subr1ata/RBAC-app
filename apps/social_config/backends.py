@@ -1,7 +1,7 @@
 # apps/social/backends.py
 
 from social_core.backends.facebook import FacebookOAuth2
-from apps.social.models import SocialMediaIntegration
+from apps.social_config.models import SocialMediaIntegration
 
 class DynamicFacebookOAuth2(FacebookOAuth2):
     def get_key_and_secret(self):

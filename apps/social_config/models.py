@@ -13,6 +13,9 @@ class SocialMediaIntegration(models.Model):
     access_token = models.TextField(blank=True, null=True)  # Ensure this field exists
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    user_id = models.CharField(max_length=255, blank=True, null=True)  # Facebook User ID
+    page_id = models.CharField(max_length=255, blank=True, null=True)  # Facebook Page ID
+    page_access_token = models.TextField(blank=True, null=True)  # Page Access Token
 
     def __str__(self):
         return self.platform

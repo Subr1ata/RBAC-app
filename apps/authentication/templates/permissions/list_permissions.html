@@ -62,7 +62,13 @@
             <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" style="width: 112.929px;" aria-label="Due Date: activate to sort column ascending">Codename</th>
             <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" style="width: 65.9px;" aria-label="Total: activate to sort column ascending">Name</th>
 
-            <th class="sorting_disabled" rowspan="1" colspan="1" style="width: 94.0571px;" aria-label="Actions">Actions</th>
+            <th class="sorting_disabled" rowspan="1" colspan="1" style="width: 94.0571px;" aria-label="Actions">
+              {% if perms.authentication.delete_role %}
+                Actions
+              {% else %}
+                &nbsp;
+              {% endif %}
+            </th>
           </tr>
         </thead>
         <tbody>

@@ -44,6 +44,7 @@ DEBUG = os.environ.get("DEBUG", 'True').lower() in ['true', 'yes', '1']
 
 
 AUTH_USER_MODEL = 'users.CustomUser'
+SOCIAL_AUTH_USER_MODEL = 'users.CustomUser'
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]
@@ -70,10 +71,22 @@ SOCIAL_AUTH_FACEBOOK_SCOPE = ["email", "instagram_basic", "instagram_content_pub
             "business_management", "ads_read"]
 
 AUTHENTICATION_BACKENDS = [
-    'apps.social.backends.DynamicFacebookOAuth2',
+    'apps.social_config.backends.DynamicFacebookOAuth2',
     # 'social_core.backends.facebook.FacebookOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'social_core.pipeline.user.create_user',  # Ensure this step is included
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+)
 
 # Application definition
 
@@ -95,9 +108,10 @@ INSTALLED_APPS = [
     "apps.forms",
     "apps.form_layouts",
     "apps.tables",
-    "apps.social",
+    "apps.social_config",
     'social_django',
-    "apps.users"
+    "apps.users",
+    "apps.marketing"
 ]
 
 MIDDLEWARE = [
@@ -130,6 +144,7 @@ TEMPLATES = [
                 "config.context_processors.my_setting",
                 "config.context_processors.environment",
                 # "config.context_processors.facebook_credentials",
+                "apps.social_config.context_processors.social_configs",
             ],
             "libraries": {
                 "theme": "web_project.template_tags.theme",

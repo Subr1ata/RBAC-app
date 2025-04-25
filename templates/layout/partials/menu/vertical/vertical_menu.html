@@ -31,21 +31,36 @@
       </ul>
     </li>
 
-    {% comment %} <li class="menu-item {% if '/users/' in request.path %}active open{% endif %}">
-      {% if perms.users.view_customuser %}
+    <!-- Marketing -->
+    <li class="menu-item {% if '/marketing/' in request.path %}active open{% endif %}">
+      {% if show_marketing_menu %}
         <a href="javascript:void(0);" class="menu-link menu-toggle">
-          <i class="menu-icon tf-icons bx bx-user-circle"></i>
-          <div class="text-truncate" data-i18n="Users">Users</div>
+          <i class="menu-icon tf-icons bx bxs-megaphone"></i>
+          <div class="text-truncate" data-i18n="Marketing">Marketing</div>
         </a>
       {% endif %}
       <ul class="menu-sub">
-        <li class="menu-item {% if '/list/' in request.path %}active{% endif %}">
-          <a href="{% url 'view_users' %}" class="menu-link">
-            <div class="text-truncate" data-i18n="List">List</div>
+        {% if is_facebook_enabled %}
+          <li class="menu-item {% if '/facebook/' in request.path %}active{% endif %}">
+            <a href="{% url 'facebook_manage' %}" class="menu-link">
+              <div class="text-truncate" data-i18n="Facebook">Facebook</div>
+            </a>
+          </li>
+        {% else %}
+        <!-- Facebook Disabled with Tooltip -->
+        <li class="menu-item">
+          <a href="{% url 'social-media-settings' %}" class="menu-link disabled" data-bs-toggle="tooltip" data-bs-placement="top" title="Enable Facebook">
+            <div class="text-truncate" data-i18n="Facebook">Facebook</div>
           </a>
         </li>
+        {% endif %}
+        {% comment %} <li class="menu-item {% if '/social_media_settings/' in request.path %}active{% endif %}">
+          <a href="{% url 'socia-media-settings' %}" class="menu-link">
+            <div class="text-truncate" data-i18n="Social Media">Social Media</div>
+          </a>
+        </li> {% endcomment %}
       </ul>
-    </li> {% endcomment %}
+    </li>
 
     <!-- Account -->
     <li class="menu-item {% if '/account_settings/' in request.path %}active open{% endif %}">
@@ -60,7 +75,7 @@
           </a>
         </li>
         <li class="menu-item {% if '/social_media_settings/' in request.path %}active{% endif %}">
-          <a href="{% url 'socia-media-settings' %}" class="menu-link">
+          <a href="{% url 'social-media-settings' %}" class="menu-link">
             <div class="text-truncate" data-i18n="Social Media">Social Media</div>
           </a>
         </li>
@@ -68,7 +83,6 @@
     </li>
 
     <!-- Auth -->
-    {% comment %} Using different request.path for different apps urls in django {% endcomment %}
     <li class="menu-item {% if '/auth/' in request.path or '/users/' in request.path %}active open{% endif %}">
       <a href="javascript:void(0);" class="menu-link menu-toggle">
         <i class="menu-icon tf-icons bx bx-lock-open-alt"></i>
