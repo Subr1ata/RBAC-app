@@ -1,3 +1,27 @@
+<style>
+  .list-group-item {
+    border: none;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+  }
+
+  .list-group-item img {
+    border: 1px solid #ddd;
+  }
+
+  .hover-shadow:hover {
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.15) !important;
+    transform: translateY(-3px);
+  }
+
+  .list-group-item:hover {
+    background-color: #eef1f6;
+    transform: translateY(-2px);
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08);
+  }
+</style>
 
 <div class="container-xxl flex-grow-1 container-p-y">
 
@@ -13,64 +37,106 @@
   </div> {% endcomment %}
 
   <!-- Trigger Page/Group Modal -->
-  <div class="card" id="selectedPage">
-    <div class="card-body text-center">
-      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pageGroupModal">
-        <i class="bx bxl-facebook me-1"></i> Choose Page or Group
-      </button>
+  {% if selected_page %}
+    <div class="card mb-5" id="selectedPage">
+      <div class="card-body text-center">
+        <h5 class="mb-0">You are connected to a Facebook Page</h5>
+        <div class="d-flex align-items-center justify-content-center mb-3">
+          <img src="{{ selected_page.img }}" class="rounded-circle me-3" width="60" height="60" alt="Page Image">
+          <div>
+            <h6 class="mb-1">{{ selected_page.name }}</h6>
+            <p class="mb-0 text-muted">Selected Page</p>
+          </div>
+        </div>
+        <p class="text-muted">You can manage your posts and feeds here.</p>
+      </div>
     </div>
-  </div>
+  {% else %}
+    <div class="card mb-4">
+      <div class="card-body text-center">
+        <h5 class="mb-0">Connect to a Facebook Page or Group</h5>
+        <p class="text-muted">To manage your posts, please connect to a page or group.</p>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pageGroupModal">
+          <i class="bx bxl-facebook me-1"></i> Connect Now
+        </button>
+      </div>
+    </div>
+  {% endif %}
 
   <!-- Sneat Bootstrap 5 Admin Template - Custom Modal/Action UI with SVGs -->
 
-  <div class="container-xxl flex-grow-1 container-p-y">
+  {% comment %} <div class="container-xxl flex-grow-1 container-p-y"> {% endcomment %}
   <!-- Page Feeds Section -->
-  <div class="card mb-4 shadow-sm">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h5 class="card-title mb-0">📄 Page Feeds</h5>
-    </div>
-
-    <div class="card-body">
-      {% for page in fb_user.all_pages %}
-        <div class="mb-5 border-bottom pb-4">
-          <!-- Page Info -->
-          <div class="d-flex align-items-center mb-3">
-            <img src="{{ page.img }}" class="rounded-circle me-3 border border-2" width="60" height="60" alt="Page Image">
-            <div>
-              <h6 class="mb-0">{{ page.name }}</h6>
-              <span class="badge bg-label-primary">Active Page</span>
-            </div>
+    <div class="card mb-4 shadow-sm gap-2">
+      <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">Create a Post</h5>
+      </div>
+      <div class="card-body">
+        <form id="createPostForm">
+          <div class="mb-3">
+            <textarea class="form-control" id="postMessage" rows="3" placeholder="Write your post here..." required></textarea>
           </div>
+          <button type="button" class="btn btn-primary" onclick="createPost('{{ page.id }}', '{{ page.access_token }}')">
+            <i class="bx bx-send"></i> Publish
+          </button>
+        </form>
+      </div>
+    </div>
+  {% comment %} </div> {% endcomment %}
 
-          <!-- Feeds -->
-          <div class="row">
-            {% for feed in page.feeds %}
-              <div class="col-md-6 col-lg-4">
-                <div class="card shadow-sm mb-4 h-100">
-                  <div class="card-body">
-                    <p class="mb-2"><strong>📝 Message:</strong> {{ feed.message|default:"No message" }}</p>
-                    <p class="text-muted small mb-3"><i class="bx bx-time-five"></i> {{ feed.created_time }}</p>
+  {% comment %} <div class="container-xxl flex-grow-1 container-p-y"> {% endcomment %}
+  <!-- Page Feeds Section -->
+    <div class="card mb-4 shadow-sm gap-2">
+      <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">📄 Page Feeds</h5>
+      </div>
 
+      <div class="card-body">
+        {% for page in fb_user.all_pages %}
+          <div class="mb-5 pb-4">
+            <!-- Page Info -->
+            <div class="d-flex align-items-center mb-4">
+              <img src="{{ page.img }}" class="rounded-circle me-3 border border-2" width="60" height="60" style="object-fit: cover;" alt="Page Image">
+              <div>
+                <h5 class="mb-1">{{ page.name }}</h5>
+                <span class="badge bg-label-primary">Active Page</span>
+              </div>
+            </div>
+
+            <!-- Feeds List -->
+            <ul class="list-group list-group-flush gap-2">
+              {% for feed in page.feeds %}
+                <li class="list-group-item list-group-item-action mb-2 p-3 rounded shadow-sm" style="background-color: #f9fafb;">
+                  <div class="d-flex">
                     <!-- Feed Image -->
                     {% if feed.attachments and feed.attachments.data %}
                       {% for attachment in feed.attachments.data %}
                         {% if attachment.media and attachment.media.image %}
-                          <img src="{{ attachment.media.image.src }}" class="img-fluid rounded mb-2" alt="Feed Image">
+                          <img src="{{ attachment.media.image.src }}" class="rounded me-3 border" width="80" height="80" style="object-fit: cover;" alt="Feed Image">
                         {% endif %}
                       {% endfor %}
                     {% elif feed.full_picture %}
-                      <img src="{{ feed.full_picture }}" class="img-fluid rounded mb-2" alt="Feed Image">
+                      <img src="{{ feed.full_picture }}" class="rounded me-3 border" width="80" height="80" style="object-fit: cover;" alt="Feed Image">
                     {% endif %}
+
+                    <!-- Feed Content -->
+                    <div class="flex-grow-1">
+                      <p class="mb-2 fw-semibold">
+                        📝 {{ feed.message|default:"No message" }}
+                      </p>
+                      <small class="text-muted">
+                        <i class="bx bx-time-five"></i> {{ feed.created_time }}
+                      </small>
+                    </div>
                   </div>
-                </div>
-              </div>
-            {% endfor %}
+                </li>
+              {% endfor %}
+            </ul>
           </div>
-        </div>
-      {% endfor %}
+        {% endfor %}
+      </div>
     </div>
-  </div>
-</div>
+  {% comment %} </div> {% endcomment %}
 
 
   <!-- Modal: Page/Group Selector -->
@@ -96,13 +162,6 @@
                     <button class="btn btn-outline-primary btn-sm" onclick="selectPage('{{ page.id }}', '{{ page.access_token }}')">Select</button>
                   </div>
                 </div>
-                {% comment %} <div class="d-flex justify-content-between align-items-center">
-                  <img src="{{ page.page_image_url }}" class="rounded-circle me-3" width="60" height="60" alt="Profile">
-                  <div>
-                    <span>{{ page.name }}</span>
-                    <button class="btn btn-outline-primary btn-sm" onclick="selectPage('{{ page.id }}')">Select</button>
-                  </div>
-                </div> {% endcomment %}
               </div>
               {% endfor %}
             </div>

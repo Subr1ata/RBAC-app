@@ -94,66 +94,6 @@ class SocialView(TemplateView):
 
         return redirect('/account_settings/social_media_settings/')
 
-    # @login_required
-    # def facebook_callback(request):
-    #     try:
-    #         # Get the user's social auth object for Facebook
-    #         user_social_auth = request.user.social_auth.get(provider='facebook')
-    #         access_token = user_social_auth.extra_data['access_token']
-
-    #         user_info_url = f"https://graph.facebook.com/me?access_token={access_token}"
-    #         user_profile_img_url = f"https://graph.facebook.com/me/picture?type=large&redirect=false&access_token={access_token}"
-
-    #         user_info_response = requests.get(user_info_url)
-    #         user_info_response.raise_for_status()  # Raise an exception for HTTP errors
-
-    #         user_profile_img_response = requests.get(user_profile_img_url)
-    #         user_profile_img_response.raise_for_status()  # Raise an exception for HTTP errors
-
-
-    #         user_info = user_info_response.json()
-    #         user_id = user_info.get("id")
-
-    #         user_profile_img = user_profile_img_response.json().get("data", {})
-    #         profile_img_url = user_profile_img.get('url')
-
-    #         pages_url = f"https://graph.facebook.com/v22.0/{user_id}/accounts?access_token={access_token}"
-    #         response = requests.get(pages_url)
-    #         response.raise_for_status()  # Raise an exception for HTTP errors
-    #         pages_data = response.json().get("data", [])
-
-    #         if not pages_data:
-    #             messages.error(request, "No pages found for this Facebook account.")
-    #             return redirect('/account_settings/social_media_settings/')
-
-    #         user_info['img'] = profile_img_url
-    #         user_info['access_token'] = access_token
-
-    #         social_user_details = {
-    #             "user_info": user_info,
-    #             "all_pages": pages_data,
-    #         }
-
-    #         # Save the access token to the database
-    #         SocialMediaIntegration.objects.update_or_create(
-    #             platform="facebook",
-    #             defaults={
-    #                 # "access_token": access_token,
-    #                 "is_enabled": True,
-    #                 "social_user_details": json.dumps(social_user_details, cls=DjangoJSONEncoder),
-    #             },
-    #         )
-
-    #         # Save the access token to the database or use it as needed
-    #         # messages.success(request, f"Facebook Access Token: {access_token}")
-    #         messages.success(request, "Facebook Access Token saved successfully!")
-
-    #     except UserSocialAuth.DoesNotExist:
-    #         messages.error(request, "Facebook authentication failed.")
-    #         # messages.error(request, "Facebook authentication failed.")
-
-    #     return redirect('/account_settings/social_media_settings/')
-
     # Predefined function
     def get_context_data(self, **kwargs):
         # A function to init the global layout. It is defined in web_project/__init__.py file
@@ -176,7 +116,7 @@ class SocialView(TemplateView):
         # Ensure social_user_details is a valid dictionary
         social_user_details = facebook_integration.social_user_details or {}
         user_info = social_user_details.get("user_info", {})
-        all_pages = social_user_details.get("all_pages", [])
+        # all_pages = social_user_details.get("all_pages", [])
 
         # Extract the access token
         access_token = user_info.get("access_token", "")
@@ -222,8 +162,8 @@ class SocialView(TemplateView):
         facebook_integration, created = SocialMediaIntegration.objects.get_or_create(platform="facebook")
 
         if request.method == "POST":
-            platform = request.POST.get("platform")
-            is_enabled = request.POST.get("is_enabled") == "on"
+            # platform = request.POST.get("platform")
+            # is_enabled = request.POST.get("is_enabled") == "on"
             # Save API Key and Secret
             api_key = request.POST.get("api_key")
             api_secret = request.POST.get("api_secret")

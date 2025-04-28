@@ -1,24 +1,22 @@
 # Use the official Python image as the base image
-FROM python:3.12-alpine
+FROM python:3.11.4-alpine
 
-# Set environment variables
+# Set working directory inside the container
+WORKDIR /usr/src/app
+
+# Environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Set the working directory in the container
-WORKDIR /app
+RUN pip install --upgrade pip
+COPY ./requirements.txt /usr/src/app/requirements.txt
+RUN pip install -r requirements.txt
 
-# Copy the requirements file
-COPY requirements.txt /app/
+# RUN cp -r /usr/src/app /usr/src/app_backup
 
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+COPY ./entrypoint.sh /usr/src/app/entrypoint.sh
 
-# Copy the entire project into the container
-COPY . /app/
+COPY . /usr/src/app
 
-# Expose the port the app runs on
-EXPOSE 8000
-
-# Run the Django development server
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Set the entrypoint
+ENTRYPOINT ["/usr/src/app/entrypoint.sh"]

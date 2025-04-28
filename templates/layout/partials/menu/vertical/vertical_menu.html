@@ -43,14 +43,20 @@
         {% if is_facebook_enabled %}
           <li class="menu-item {% if '/facebook/' in request.path %}active{% endif %}">
             <a href="{% url 'facebook_manage' %}" class="menu-link">
-              <div class="text-truncate" data-i18n="Facebook">Facebook</div>
+              <div class="text-truncate" data-i18n="Facebook">
+                <i class="bx bxl-facebook me-1 rounded" style="color: #1877F2;"></i>
+                Facebook
+              </div>
             </a>
           </li>
         {% else %}
         <!-- Facebook Disabled with Tooltip -->
         <li class="menu-item">
           <a href="{% url 'social-media-settings' %}" class="menu-link disabled" data-bs-toggle="tooltip" data-bs-placement="top" title="Enable Facebook">
-            <div class="text-truncate" data-i18n="Facebook">Facebook</div>
+            <div class="text-truncate" data-i18n="Facebook">
+              <i class="bx bxl-facebook me-1"></i>
+              Facebook
+            </div>
           </a>
         </li>
         {% endif %}

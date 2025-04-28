@@ -47,12 +47,18 @@ class FacebookManageView(TemplateView):
         social_user_details = facebook_integration.social_user_details or {}
         user_info = social_user_details.get("user_info", {})
         all_pages = social_user_details.get("all_pages", [])
+        page_id = facebook_integration.page_id
 
         # Extract the page access token from the first page (if available)
         for account in all_pages:
             account["page_access_token"] = account.get("access_token")
 
+        # Find the selected page
+        selected_page = next((page for page in all_pages if page.get("id") == page_id), None)
+
         # Pass data from the database to the template
+        # Pass the selected page details to the template
+        context["selected_page"] = selected_page
         context["fb_user"] = {
             "name": user_info.get("name"),
             "id": user_info.get("id"),
@@ -61,80 +67,6 @@ class FacebookManageView(TemplateView):
             "all_pages": all_pages,
         }
         return context
-
-    # def get_context_data(self, **kwargs):
-    #     print("get_context_data is being called")
-    #     context = TemplateLayout.init(self, super().get_context_data(**kwargs))
-
-    #     # Fetch Facebook integration details
-    #     facebook_integration = SocialMediaIntegration.objects.filter(platform="facebook").first()
-    #     if not facebook_integration or not facebook_integration.page_access_token:
-    #         messages.error(self.request, "Please connect to Facebook and select a page first.")
-    #         return context
-
-    #     # Fetch Facebook page feeds and profile picture
-    #     page_access_token = facebook_integration.page_access_token
-    #     user_access_token = facebook_integration.access_token
-
-    #     user_info_url = f"https://graph.facebook.com/me?access_token={user_access_token}"
-    #     user_profile_pic_url = f"https://graph.facebook.com/me/picture?type=large&redirect=false&access_token={user_access_token}"
-
-    #     try:
-    #         print("Fetching user info...")
-    #         # Fetch user info
-    #         user_info_res = requests.get(user_info_url)
-    #         user_info_res.raise_for_status()
-    #         user_info = user_info_res.json()  # Extract user info
-    #         user_id = user_info.get("id")  # Extract the user ID
-    #         print("User info fetched successfully")
-
-    #         # Fetch profile picture
-    #         profile_pic_img_res = requests.get(user_profile_pic_url)
-    #         profile_pic_img_res.raise_for_status()
-    #         profile_pic_img = profile_pic_img_res.json().get("data", {})
-
-    #         # Fetch Facebook accounts
-    #         fb_account_url = f"https://graph.facebook.com/v22.0/{user_id}/accounts?access_token={page_access_token}"
-    #         fb_account_res = requests.get(fb_account_url)
-    #         fb_account_res.raise_for_status()
-    #         fb_account = fb_account_res.json().get("data", [])
-
-    #         # Iterate through accounts and fetch page images
-    #         for account in fb_account:
-    #             page_id = account.get("id")
-    #             page_access_token = account.get("access_token")
-    #             page_image_url = f"https://graph.facebook.com/{page_id}/picture?type=large&redirect=false&access_token={page_access_token}"
-
-    #             # Fetch page image
-    #             page_image_res = requests.get(page_image_url)
-    #             page_image_res.raise_for_status()
-    #             page_image_data = page_image_res.json().get("data", {})
-
-    #             # Add the image URL to the account object
-    #             account["page_image_url"] = page_image_data.get("url")
-    #             print(f"Page ID: {page_id}, Image URL: {account['page_image_url']}")
-
-    #         # Fetch feeds using the user ID
-    #         feeds_url = f"https://graph.facebook.com/v22.0/{user_id}/feed?access_token={page_access_token}"
-    #         response = requests.get(feeds_url)
-    #         response.raise_for_status()
-    #         feeds = response.json().get("data", [])
-    #     except requests.exceptions.RequestException as e:
-    #         print('Error fetching data from Facebook API:', e)
-    #         profile_pic_img = {}
-    #         feeds = []
-    #         user_info = {}
-    #         fb_account = []
-
-    #     context["feeds"] = feeds
-    #     context["page_name"] = facebook_integration.page_id
-    #     context["page_access_token"] = facebook_integration.page_access_token
-    #     context["fb_user"] = {
-    #         "picture": profile_pic_img.get("url", None),
-    #         "user_info": user_info,
-    #         "account": fb_account
-    #     }
-    #     return context
 
     def post(self, request, *args, **kwargs):
         # Handle post creation, scheduling, or queueing

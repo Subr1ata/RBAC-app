@@ -1,75 +1,37 @@
 services:
-  db:
-    image: mysql:8
-    container_name: mysql_container
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: mysecurepassword
-      MYSQL_DATABASE: social
-      MYSQL_HOST: 192.168.1.5
-    ports:
-      - "3307:3307"
-    volumes:
-      - db_data:/var/lib/mysql
+    redis:
+        image: redis:7.0.11-alpine
 
-  web:
-    build: .
-    depends_on:
-      - db
-    environment:
-      DB_HOST: db
-      DB_NAME: social
-      DB_USER: root
-      DB_PASSWORD: mysecurepassword
-      FB_APP_ID: 1139190304277565
-      FB_APP_SECRET: 8dbebb54121ea83e0161b8b8a11ecb4f
-    ports:
-      - "8000:8000"
-    command: python manage.py runserver 0.0.0.0:8000
+    django:
+        container_name: django
+        build:
+            context: .
+        command: python manage.py runserver 0.0.0.0:8000
+        volumes:
+            - .:/usr/src/app
+        # volumes:
+        #     app_data:
+        ports:
+            - 8001:8000
+        env_file:
+            - .env
+        depends_on:
+            - wait-for-db
+            - redis
 
-volumes:
-  db_data:
+    celery:
+        container_name: celery
+        build:
+            context: .
+        # command: python manage.py runserver 0.0.0.0:8000
+        # ports:
+        #     - 8001:8000
+        env_file:
+            - .env
+        depends_on:
+            # - wait-for-db
+            - redis
 
-# docker exec -it mysql_container mysql -u root -pmysecurepassword
-# docker compose exec web python manage.py migrate
-
-# version: '3.9'
-
-# services:
-#   web:
-#     build:
-#       context: .
-#       dockerfile: Dockerfile
-#     command: python manage.py runserver 0.0.0.0:8000
-#     volumes:
-#       - .:/app
-#     ports:
-#       - "8000:8000"
-#     depends_on:
-#       - db
-#     environment:
-#       - DEBUG=True
-#       - DJANGO_ENVIRONMENT=local
-#       - BASE_URL=http://localhost:8000
-#       - DB_NAME=social
-#       - DB_USER=root
-#       - DB_PASSWORD=Root@123
-#       - DB_HOST=db
-#       - DB_PORT=3307
-
-#   db:
-#     image: mysql:8.0
-#     container_name: mysql_container
-#     restart: always
-#     environment:
-#       MYSQL_DATABASE: social
-#     #   MYSQL_USER: root
-#     #   MYSQL_PASSWORD: Root@123
-#       MYSQL_ROOT_PASSWORD: somepass
-#     ports:
-#       - "3307:3307"
-#     volumes:
-#       - mysql_data:/var/lib/mysql
-
-# volumes:
-#   mysql_data:
+    wait-for-db:
+        image: busybox:latest
+        command: sh -c "until nc -z host.docker.internal 3306; do echo waiting for db...; sleep 2; done"
