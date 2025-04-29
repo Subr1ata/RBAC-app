@@ -23,13 +23,13 @@ services:
         container_name: celery
         build:
             context: .
-        # command: python manage.py runserver 0.0.0.0:8000
-        # ports:
-        #     - 8001:8000
+        command: celery --app=config worker -l INFO
+        volumes:
+            - .:/usr/src/app
         env_file:
             - .env
         depends_on:
-            # - wait-for-db
+            - wait-for-db
             - redis
 
     wait-for-db:

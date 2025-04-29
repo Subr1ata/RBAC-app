@@ -6,9 +6,37 @@ import requests
 import datetime
 from web_project import TemplateLayout
 from django.http import JsonResponse
+from apps.marketing.tasks import schedule_facebook_post
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 class FacebookManageView(TemplateView):
     template_name = "facebook/manage.html"
+
+    @csrf_exempt
+    def create_post(request):
+        if request.method == 'POST':
+            data = json.loads(request.body)
+            page_id = data.get('page_id')
+            access_token = data.get('access_token')
+            message = data.get('message')
+            schedule_time = data.get('schedule_time')
+
+            print("Received data:", data)
+            if not page_id or not access_token or not message:
+                return JsonResponse({'success': False, 'error': 'Missing required fields.'})
+
+            # Convert schedule_time to UNIX timestamp
+            if schedule_time:
+                try:
+                    schedule_time_unix = int(datetime.datetime.strptime(schedule_time, "%Y-%m-%dT%H:%M").timestamp())
+                    # Enqueue the Celery task
+                    schedule_facebook_post.delay(page_id, access_token, message, schedule_time_unix)
+                    return JsonResponse({'success': True, 'message': 'Post scheduled successfully.'})
+                except ValueError:
+                    return JsonResponse({'success': False, 'error': 'Invalid schedule time format.'})
+            else:
+                return JsonResponse({'success': False, 'error': 'Schedule time is required for scheduling.'})
 
     def facebook_marketing(self):
         # Fetch Facebook integration details
@@ -58,6 +86,8 @@ class FacebookManageView(TemplateView):
 
         # Pass data from the database to the template
         # Pass the selected page details to the template
+        context['page_id'] = page_id
+        context['page_access_token'] = facebook_integration.page_access_token
         context["selected_page"] = selected_page
         context["fb_user"] = {
             "name": user_info.get("name"),
@@ -87,7 +117,7 @@ class FacebookManageView(TemplateView):
             return redirect("marketing:facebook_manage")
 
         # Prepare API request
-        post_url = f"https://graph.facebook.com/v22.0/{page_id}/feed"
+        # post_url = f"https://graph.facebook.com/v22.0/{page_id}/feed"
         payload = {"message": message, "access_token": page_access_token}
 
         # Add scheduling if provided
@@ -95,13 +125,14 @@ class FacebookManageView(TemplateView):
             schedule_time_unix = int(datetime.datetime.strptime(schedule_time, "%Y-%m-%d %H:%M:%S").timestamp())
             payload["published"] = False
             payload["scheduled_publish_time"] = schedule_time_unix
+            schedule_facebook_post.delay(page_id, page_access_token, message, schedule_time_unix)
 
         # Send the post request
-        response = requests.post(post_url, data=payload)
-        if response.status_code == 200:
-            messages.success(request, "Post created successfully.")
-        else:
-            messages.error(request, f"Failed to create post: {response.json().get('error', {}).get('message')}")
+        # response = requests.post(post_url, data=payload)
+        # if response.status_code == 200:
+        #     messages.success(request, "Post created successfully.")
+        # else:
+        #     messages.error(request, f"Failed to create post: {response.json().get('error', {}).get('message')}")
 
         return redirect("marketing:facebook_manage")
 
@@ -152,3 +183,49 @@ class FacebookManageView(TemplateView):
             }, status=200)
         except requests.exceptions.RequestException as e:
             return JsonResponse({"error": str(e)}, status=500)
+
+    def sync_feeds(request, page_id, access_token):
+        try:
+            # Fetch the latest feeds from the Facebook Graph API
+            feeds_url = f"https://graph.facebook.com/v22.0/{page_id}/feed?fields=message,created_time,attachments,full_picture&access_token={access_token}"
+            response = requests.get(feeds_url)
+            response.raise_for_status()
+            feeds = response.json().get("data", [])
+
+            # Fetch the SocialMediaIntegration object
+            facebook_integration = SocialMediaIntegration.objects.filter(platform="facebook").first()
+            if not facebook_integration:
+                return JsonResponse({'success': False, 'error': 'Facebook integration not found.'})
+
+            # Update the social_user_details JSON field
+            social_user_details = facebook_integration.social_user_details or {}
+            all_pages = social_user_details.get("all_pages", [])
+
+            # Find the selected page and update its feeds
+            for page in all_pages:
+                if page.get("id") == page_id:
+                    page["feeds"] = feeds
+                    break
+
+            # Save the updated social_user_details back to the database
+            social_user_details["all_pages"] = all_pages
+            facebook_integration.social_user_details = social_user_details
+            facebook_integration.save()
+
+            # Return the updated feeds as JSON
+            return JsonResponse({'success': True, 'feeds': feeds})
+        except requests.exceptions.RequestException as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+    def get_published_posts(request, page_id, access_token):
+        try:
+            # Fetch published posts from Facebook Graph API
+            published_posts_url = f"https://graph.facebook.com/v22.0/{page_id}/feed?fields=message,created_time,full_picture,insights.metric(post_impressions,post_reactions_by_type_total,post_comments)&access_token={access_token}"
+            response = requests.get(published_posts_url)
+            response.raise_for_status()
+            published_posts = response.json().get("data", [])
+
+            # Return the published posts as JSON
+            return JsonResponse({'success': True, 'posts': published_posts})
+        except requests.exceptions.RequestException as e:
+            return JsonResponse({'success': False, 'error': str(e)})

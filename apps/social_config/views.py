@@ -8,6 +8,7 @@ from social_django.models import UserSocialAuth
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 import requests
+from apis.facebook import feed_summary_url
 
 """
 This file is a view controller for multiple pages as a module.
@@ -53,7 +54,8 @@ class SocialView(TemplateView):
                 page_id = page.get('id')
                 page_access_token = page.get('access_token')
                 page_image_url = f"https://graph.facebook.com/{page_id}/picture?type=large&redirect=false&access_token={page_access_token}"
-                feeds_url = f"https://graph.facebook.com/{page_id}/feed?fields=message,created_time,full_picture,attachments{{media}}&access_token={page_access_token}"
+                # feeds_url = f"https://graph.facebook.com/{page_id}/feed?fields=message,created_time,full_picture,attachments{{media}}&access_token={page_access_token}"
+                feeds_url = feed_summary_url(page_id, page_access_token)
 
                 # Fetch page image
                 page_image_res = requests.get(page_image_url)

@@ -23,8 +23,7 @@
   }
 </style>
 
-<div class="container-xxl flex-grow-1 container-p-y">
-
+<div class="mt-4">
   <!-- Profile Section -->
   {% comment %} <div class="card mb-4">
     <div class="card-body d-flex align-items-center">
@@ -38,7 +37,7 @@
 
   <!-- Trigger Page/Group Modal -->
   {% if selected_page %}
-    <div class="card mb-5" id="selectedPage">
+    <div class="card mb-2" id="selectedPage">
       <div class="card-body text-center">
         <h5 class="mb-0">You are connected to a Facebook Page</h5>
         <div class="d-flex align-items-center justify-content-center mb-3">
@@ -63,32 +62,17 @@
     </div>
   {% endif %}
 
-  <!-- Sneat Bootstrap 5 Admin Template - Custom Modal/Action UI with SVGs -->
-
-  {% comment %} <div class="container-xxl flex-grow-1 container-p-y"> {% endcomment %}
-  <!-- Page Feeds Section -->
-    <div class="card mb-4 shadow-sm gap-2">
-      <div class="card-header bg-primary text-white">
-        <h5 class="card-title mb-0">Create a Post</h5>
-      </div>
-      <div class="card-body">
-        <form id="createPostForm">
-          <div class="mb-3">
-            <textarea class="form-control" id="postMessage" rows="3" placeholder="Write your post here..." required></textarea>
-          </div>
-          <button type="button" class="btn btn-primary" onclick="createPost('{{ page.id }}', '{{ page.access_token }}')">
-            <i class="bx bx-send"></i> Publish
-          </button>
-        </form>
-      </div>
-    </div>
+  {% include "shared/tabs.html" %}
+  </div>
   {% comment %} </div> {% endcomment %}
 
-  {% comment %} <div class="container-xxl flex-grow-1 container-p-y"> {% endcomment %}
   <!-- Page Feeds Section -->
     <div class="card mb-4 shadow-sm gap-2">
-      <div class="card-header bg-primary text-white">
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="card-title mb-0">📄 Page Feeds</h5>
+        <button class="btn btn-light btn-sm" onclick="syncFeeds('{{ page_id }}', '{{ page_access_token }}')">
+          <i class="bx bx-refresh"></i> Sync Feeds
+        </button>
       </div>
 
       <div class="card-body">
@@ -197,8 +181,63 @@
 
 <!-- JS Logic -->
 <script>
+  function syncFeeds(pageId, accessToken) {
+    fetch(`/marketing/facebook/sync-feeds/${pageId}/${accessToken}/`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          alert('Feeds synced successfully!');
+          location.reload();
+        } else {
+          alert('Error syncing feeds: ' + data.error);
+        }
+      })
+      .catch((error) => {
+        console.error('Error syncing feeds:', error);
+        alert('An error occurred while syncing the feeds.');
+      });
+  }
+
+  function createPost(pageId, accessToken) {
+    const message = document.getElementById('postMessage').value;
+    const scheduleTime = document.getElementById('scheduleTime').value;
+    console.log('pageId:', pageId);
+    console.log('accessToken:', accessToken);
+    if (!message) {
+      alert('Please enter a message for the post.');
+      return;
+    }
+
+    fetch('/marketing/facebook/create-post/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}',
+      },
+      body: JSON.stringify({
+        page_id: pageId,
+        access_token: accessToken,
+        message: message,
+        schedule_time: scheduleTime,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          alert('Post created successfully!');
+          location.reload();
+        } else {
+          alert('Error creating post: ' + data.error);
+        }
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        alert('An error occurred while creating the post.');
+      });
+  }
+
   function selectPage(pageId, access_token) {
-    fetch(`/facebook/select-page/${pageId}/${access_token}/`)
+    fetch(`/marketing/facebook/select-page/${pageId}/${access_token}/`)
     .then(res => res.json())
     .then(data => {
       console.log('data ---> ' ,data);
