@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from apps.marketing.tasks import schedule_facebook_post
 from django.views.decorators.csrf import csrf_exempt
 import json
+from apis.facebook import feed_summary_url
 
 class FacebookManageView(TemplateView):
     template_name = "facebook/manage.html"
@@ -220,7 +221,7 @@ class FacebookManageView(TemplateView):
     def get_published_posts(request, page_id, access_token):
         try:
             # Fetch published posts from Facebook Graph API
-            published_posts_url = f"https://graph.facebook.com/v22.0/{page_id}/feed?fields=message,created_time,full_picture,insights.metric(post_impressions,post_reactions_by_type_total,post_comments)&access_token={access_token}"
+            published_posts_url = feed_summary_url(page_id, access_token)
             response = requests.get(published_posts_url)
             response.raise_for_status()
             published_posts = response.json().get("data", [])
