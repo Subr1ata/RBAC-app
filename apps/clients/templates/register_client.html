@@ -1,0 +1,90 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% comment %} {% load json_script %} {% endcomment %}
+{% block title %}Client - Register{% endblock %}
+
+{% comment %} {% block page_css %} {% endcomment %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8 col-sm-12">
+      <!-- Card for Registration Form -->
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white text-center">
+          <h4 class="mb-0">Register Client</h4>
+        </div>
+        <div class="card-body">
+          <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <!-- Name Field -->
+            <div class="mb-3">
+              {% comment %} <label for="id_name" class="form-label">Client Name</label> {% endcomment %}
+              {{ form.name|as_crispy_field }}
+            </div>
+            <!-- Email Field -->
+            <div class="mb-3">
+              {% comment %} <label for="id_email" class="form-label">Email Address</label> {% endcomment %}
+              {{ form.email|as_crispy_field }}
+            </div>
+            <!-- Business Name Field -->
+            <div class="mb-3">
+              {% comment %} <label for="id_business_name" class="form-label">Business Name</label> {% endcomment %}
+              {{ form.business_name|as_crispy_field }}
+            </div>
+            <!-- Phone Number Field -->
+            <div class="mb-3">
+              {% comment %} <label for="id_phonenumber" class="form-label">Phone Number</label> {% endcomment %}
+              {{ form.phone_number|as_crispy_field }}
+            </div>
+            <!-- Address Field -->
+            <div class="mb-3">
+              {% comment %} <label for="id_address" class="form-label">Address</label> {% endcomment %}
+              {{ form.address|as_crispy_field }}
+            </div>
+            <!-- Unique Store Code Field -->
+            <div class="mb-3">
+              {% comment %} <label for="id_uniquestorecode" class="form-label">Unique Store Code</label> {% endcomment %}
+              {{ form.unique_store_code|as_crispy_field }}
+            </div>
+            <!-- Submit Button -->
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary">
+                <i class="bx bx-user-plus me-1"></i> Register
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        Client registered successfully!
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_js %}
+{{ block.super }}
+<script>
+  // Show the toast if a success message is present
+  {% if messages %}
+    const toastElement = document.getElementById('successToast');
+    const toast = new bootstrap.Toast(toastElement);
+    toast.show();
+  {% endif %}
+</script>
+{% endblock page_js %}

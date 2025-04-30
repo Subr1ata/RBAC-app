@@ -94,6 +94,8 @@ SOCIAL_AUTH_PIPELINE = (
 # Application definition
 
 INSTALLED_APPS = [
+    'crispy_forms',
+    'crispy_bootstrap5',  # Use Bootstrap 5 for styling
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -101,21 +103,17 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "apps.dashboards",
-    "apps.layouts",
     "apps.pages",
     "apps.authentication",
-    "apps.cards",
-    "apps.ui",
-    "apps.extended_ui",
-    "apps.icons",
-    "apps.forms",
-    "apps.form_layouts",
-    "apps.tables",
     "apps.social_config",
     'social_django',
     "apps.users",
-    "apps.marketing"
+    "apps.marketing",
+    "apps.clients",
 ]
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -129,6 +127,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     'social_django.middleware.SocialAuthExceptionMiddleware',
     "config.middleware.LoginRequiredMiddleware",
+    'config.middleware.MultiTenantMiddleware'
 ]
 
 ROOT_URLCONF = "config.urls"

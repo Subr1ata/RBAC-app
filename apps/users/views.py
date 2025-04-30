@@ -11,7 +11,15 @@ def view_users(request):
 
     # Fetch all users
     # users = get_user_model().objects.all()
-    users = CustomUser.objects.all().prefetch_related('groups')
+    # users = CustomUser.objects.all().prefetch_related('groups')
+    # print("User is superuser:", request.user.is_superuser, CustomUser.objects.filter(client=request.user.client))
+
+    # if(not request.user.client)
+
+    if request.user.is_superuser:
+        users = CustomUser.objects.all().prefetch_related('groups')
+    else:
+        users = CustomUser.objects.filter(client=request.user.client).prefetch_related('groups')
     # Initial context
     context = {
         "users": users,

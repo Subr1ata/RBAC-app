@@ -60,11 +60,6 @@
           </a>
         </li>
         {% endif %}
-        {% comment %} <li class="menu-item {% if '/social_media_settings/' in request.path %}active{% endif %}">
-          <a href="{% url 'socia-media-settings' %}" class="menu-link">
-            <div class="text-truncate" data-i18n="Social Media">Social Media</div>
-          </a>
-        </li> {% endcomment %}
       </ul>
     </li>
 
@@ -103,11 +98,13 @@
           </li>
         {% endif %}
 
+        {% if perms.authentication.view_role %}
         <li class="menu-item {% if '/roles/' in request.path %}active{% endif %}">
           <a href="{% url 'view-roles' %}" class="menu-link">
             <div class="text-truncate" data-i18n="Roles & Permission">Roles</div>
           </a>
         </li>
+        {% endif %}
 
         {% if perms.authentication.view_role %}
           <li class="menu-item {% if '/list-permissions/' in request.path or '/view-permissions' in request.path %}active{% endif %}">
@@ -118,5 +115,27 @@
         {% endif %}
       </ul>
     </li>
+
+    <!-- Clients -->
+    {% if user.is_superuser %}
+    <li class="menu-item {% if '/client/' in request.path %}active open{% endif %}">
+      <a href="{% url 'register_client' %}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-user-plus"></i>
+        <div class="text-truncate" data-i18n="Client Registration">Client Registration</div>
+      </a>
+      {% comment %} <ul class="menu-sub">
+        <li class="menu-item {% if '/account/' in request.path %}active{% endif %}">
+          <a href="{% url 'pages-account-settings-account' %}" class="menu-link">
+            <div class="text-truncate" data-i18n="General">General</div>
+          </a>
+        </li>
+        <li class="menu-item {% if '/social_media_settings/' in request.path %}active{% endif %}">
+          <a href="{% url 'social-media-settings' %}" class="menu-link">
+            <div class="text-truncate" data-i18n="Social Config">Social Config</div>
+          </a>
+        </li>
+      </ul> {% endcomment %}
+    </li>
+    {% endif %}
   </ul>
 </aside>

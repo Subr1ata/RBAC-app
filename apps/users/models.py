@@ -1,9 +1,11 @@
 from django.contrib.auth.models import AbstractUser, Permission
 from django.db import models
 from apps.authentication.models import Role
+from apps.clients.models import Client
 
 # Create your models here.
 class CustomUser(AbstractUser):
+    client = models.ForeignKey(Client, null=True, blank=True, on_delete=models.CASCADE)
     roles = models.ManyToManyField(Role, blank=True)
 
     user_permissions = models.ManyToManyField(
