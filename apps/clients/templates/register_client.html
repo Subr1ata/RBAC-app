@@ -65,7 +65,7 @@
 </div>
 
 <!-- Toast Notification -->
-<div class="toast-container position-fixed bottom-0 end-0 p-3">
+{% comment %} <div class="toast-container position-fixed bottom-0 end-0 p-3">
   <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="d-flex">
       <div class="toast-body">
@@ -74,10 +74,27 @@
       <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
   </div>
-</div>
+</div> {% endcomment %}
+
+{% if messages %}
+  {% for message in messages %}
+    {% if message.tags == "success" %}
+      <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body">
+              {{ message }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
+{% endif %}
 {% endblock %}
 
-{% block page_js %}
+{% comment %} {% block page_js %}
 {{ block.super }}
 <script>
   // Show the toast if a success message is present
@@ -86,5 +103,18 @@
     const toast = new bootstrap.Toast(toastElement);
     toast.show();
   {% endif %}
+</script>
+{% endblock page_js %} {% endcomment %}
+
+{% block page_js %}
+{{ block.super }}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const toastElement = document.getElementById('successToast');
+    if (toastElement) {
+      const toast = new bootstrap.Toast(toastElement);
+      toast.show();
+    }
+  });
 </script>
 {% endblock page_js %}

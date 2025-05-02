@@ -57,6 +57,18 @@
             {% endfor %}
         </select>
       </div>
+      {% if user.is_superuser %}
+        <div class="mb-5 fv-plugins-icon-container">
+          <label for="client" class="form-label">Assign Client</label>
+          <select name="client" id="client" class="form-select">
+              <option value="">Select Client</option>
+              {% for client in clients %}
+                  {{client}}
+                  <option value="{{ client.id }}">{{ client.name }}</option>
+              {% endfor %}
+          </select>
+        </div>
+      {% endif %}
       <div class="mb-5 fv-plugins-icon-container">
       <button type="submit" class="btn btn-primary me-sm-4 me-1" name="submitButton">Create User</button>
       <a href="{% url 'view_users' %}" class="btn btn-secondary">Back</a>

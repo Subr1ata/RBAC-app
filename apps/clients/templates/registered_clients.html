@@ -1,0 +1,154 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% comment %} {% load json_script %} {% endcomment %}
+{% block title %}Client - List{% endblock %}
+
+{% comment %} {% block page_css %} {% endcomment %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-4">Registered Clients</h1>
+    <button class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#addClientModal">Add New Client</button>
+    <table class="table table-striped mt-4">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>API Key</th>
+                <th>Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for client in page_obj %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ client.name }}</td>
+                <td>{{ client.email }}</td>
+                <td>{{ client.api_key }}</td>
+                <td>{{ client.created_at }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">No clients found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            </li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+
+<!-- Add Client Modal -->
+<div class="modal fade" id="addClientModal" tabindex="-1" aria-labelledby="addClientModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="addClientModalLabel">Add New Client</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="addClientForm" method="post" class="needs-validation" novalidate>
+              {% csrf_token %}
+              <!-- Name Field -->
+              <div class="mb-3">
+                {% comment %} <label for="id_name" class="form-label">Client Name</label> {% endcomment %}
+                {{ form.name|as_crispy_field }}
+              </div>
+              <!-- Email Field -->
+              <div class="mb-3">
+                {% comment %} <label for="id_email" class="form-label">Email Address</label> {% endcomment %}
+                {{ form.email|as_crispy_field }}
+              </div>
+              <!-- Business Name Field -->
+              <div class="mb-3">
+                {% comment %} <label for="id_business_name" class="form-label">Business Name</label> {% endcomment %}
+                {{ form.business_name|as_crispy_field }}
+              </div>
+              <!-- Phone Number Field -->
+              <div class="mb-3">
+                {% comment %} <label for="id_phonenumber" class="form-label">Phone Number</label> {% endcomment %}
+                {{ form.phone_number|as_crispy_field }}
+              </div>
+              <!-- Address Field -->
+              <div class="mb-3">
+                {% comment %} <label for="id_address" class="form-label">Address</label> {% endcomment %}
+                {{ form.address|as_crispy_field }}
+              </div>
+              <!-- Unique Store Code Field -->
+              <div class="mb-3">
+                {% comment %} <label for="id_uniquestorecode" class="form-label">Unique Store Code</label> {% endcomment %}
+                {{ form.unique_store_code|as_crispy_field }}
+              </div>
+              <!-- Submit Button -->
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary">
+                  <i class="bx bx-user-plus me-1"></i> Register
+                </button>
+              </div>
+            </form>
+              {% comment %} <form id="addClientForm">
+                  {% csrf_token %}
+                  <div class="mb-3">
+                      <label for="id_name" class="form-label">Name</label>
+                      <input type="text" class="form-control" id="id_name" name="name" required>
+                  </div>
+                  <div class="mb-3">
+                      <label for="id_email" class="form-label">Email</label>
+                      <input type="email" class="form-control" id="id_email" name="email" required>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Add Client</button>
+              </form> {% endcomment %}
+          </div>
+      </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('addClientForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+
+      fetch("{% url 'add_client_ajax' %}", {
+          method: "POST",
+          headers: {
+              'X-CSRFToken': '{{ csrf_token }}'
+          },
+          body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              alert(data.message);
+              location.reload(); // Reload the page to show the new client
+          } else {
+              alert("Error: " + JSON.stringify(data.errors));
+          }
+      })
+      .catch(error => console.error('Error:', error));
+  });
+</script>
+{% endblock %}

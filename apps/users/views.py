@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from .models import CustomUser
 from apps.authentication.models import Role
+from apps.clients.models import Client
 
 def view_users(request):
     template_name = "view_users.html"
@@ -45,12 +46,17 @@ def create_user(request):
             messages.success(request, "User created successfully!")
             return redirect('/users/list/')
     else:
-        form = CustomUserCreationForm()
+        form = CustomUserCreationForm(user=request.user)
 
     roles = Role.objects.all()
 
+    # if request.user.is_superuser:
+    #     form.fields['client'].queryset = Client.objects.all()
+    # else:
+    #     form.fields['client'].queryset = Client.objects.filter(id=request.user.client.id)
+
     # Initial context
-    context = {'form': form, 'roles': roles}
+    context = {'form': form, 'roles': roles, 'clients': Client.objects.all()}
 
     # Apply template layout enhancements (adds layout_path and other mappings)
     context = TemplateLayout().init(context)
