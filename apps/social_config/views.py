@@ -81,6 +81,7 @@ class SocialView(TemplateView):
             # Save the access token and social_user_details to the database
             SocialMediaIntegration.objects.update_or_create(
                 platform="facebook",
+                client=request.user.client,  # Ensure the integration is tied to the current client
                 defaults={
                     "is_enabled": True,
                     "social_user_details": social_user_details,  # Save as JSON
@@ -101,9 +102,28 @@ class SocialView(TemplateView):
         # A function to init the global layout. It is defined in web_project/__init__.py file
         context = TemplateLayout.init(self, super().get_context_data(**kwargs))
 
-        # facebook_integration = SocialMediaIntegration.objects.filter(platform="facebook").first()
-        facebook_integration, created = SocialMediaIntegration.objects.get_or_create(platform="facebook")
-        integrations_qs = SocialMediaIntegration.objects.all()
+        # Get the current user's client
+        client = self.request.user.client
+        print("Client:", client)
+
+        # If the client is None, show empty fields
+        if client is None:
+            context["social_user_details"] = {}
+            context["access_token"] = ""
+            context["integrations"] = []
+            context["integrations_json"] = "[]"
+            context["api_key"] = ""
+            context["api_secret"] = ""
+            return context
+
+        # Filter integrations by the current user's client
+        # If the user is not a superadmin, show configurations for their client only
+        if not self.request.user.is_superuser:
+            integrations_qs = SocialMediaIntegration.objects.filter(client=client)
+        else:
+            # If the user is a superadmin, show all configurations
+            integrations_qs = SocialMediaIntegration.objects.all()
+        # integrations_qs = SocialMediaIntegration.objects.all()
 
         # if facebook_integration and facebook_integration.social_user_details:
         #     context['social_user_details'] = facebook_integration.social_user_details
@@ -114,6 +134,12 @@ class SocialView(TemplateView):
 
         integrations = list(integrations_qs.values())  # ✅ Convert to list of dicts
         integrations_json = json.dumps(integrations, cls=DjangoJSONEncoder)
+
+        # Get the Facebook integration for the current client
+        facebook_integration, created = SocialMediaIntegration.objects.get_or_create(platform="facebook", client=client, defaults={
+        "is_enabled": True,
+        "social_user_details": {},  # Provide a default value for social_user_details
+        },)
 
         # Ensure social_user_details is a valid dictionary
         social_user_details = facebook_integration.social_user_details or {}
@@ -142,14 +168,17 @@ class SocialView(TemplateView):
         is_enabled = request.POST.get("is_enabled") == "on"
         api_key = request.POST.get("api_key")
         api_secret = request.POST.get("api_secret")
+        client = request.user.client
 
         # Save or update the integration in the database
         SocialMediaIntegration.objects.update_or_create(
             platform=platform,
+            client=client,
             defaults={
                 "is_enabled": is_enabled,
                 "api_key": api_key,
                 "api_secret": api_secret,
+                # "client": client,
             },
         )
 

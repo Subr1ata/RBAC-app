@@ -33,7 +33,7 @@
 
     <!-- Marketing -->
     <li class="menu-item {% if '/marketing/' in request.path %}active open{% endif %}">
-      {% if show_marketing_menu %}
+      {% if show_marketing_menu and perms.marketing.view_marketing %}
         <a href="javascript:void(0);" class="menu-link menu-toggle">
           <i class="menu-icon tf-icons bx bxs-megaphone"></i>
           <div class="text-truncate" data-i18n="Marketing">Marketing</div>
@@ -75,11 +75,13 @@
             <div class="text-truncate" data-i18n="General">General</div>
           </a>
         </li>
+        {% if perms.social_config.view_socialmediaintegration and request.user.is_staff %}
         <li class="menu-item {% if '/social_media_settings/' in request.path %}active{% endif %}">
           <a href="{% url 'social-media-settings' %}" class="menu-link">
             <div class="text-truncate" data-i18n="Social Config">Social Config</div>
           </a>
         </li>
+        {% endif %}
       </ul>
     </li>
 

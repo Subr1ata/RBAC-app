@@ -2,9 +2,21 @@ from django.contrib.auth.models import AbstractUser, Permission
 from django.db import models
 from apps.authentication.models import Role
 from apps.clients.models import Client
+from django.core.validators import RegexValidator
 
 # Create your models here.
 class CustomUser(AbstractUser):
+    username = models.CharField(
+        max_length=150,
+        unique=True,
+        validators=[RegexValidator(
+            regex=r'^[\w.@+-]+$',
+            message="Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters."
+        )],
+        error_messages={
+            'unique': "A user with that username already exists.",
+        },
+    )
     client = models.ForeignKey(Client, null=True, blank=True, on_delete=models.CASCADE)
     roles = models.ManyToManyField(Role, blank=True)
 

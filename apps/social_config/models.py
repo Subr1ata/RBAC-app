@@ -18,5 +18,8 @@ class SocialMediaIntegration(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        unique_together = ('platform', 'client')  # Ensure platform is unique per client
+
     def __str__(self):
         return f"{self.platform} - {self.client.name}"

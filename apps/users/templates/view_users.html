@@ -30,7 +30,12 @@
           <th>#</th>
           <th>Username</th>
           <th>Email</th>
+          {% if request.user.is_superuser %}
           <th>Roles</th>
+          {% endif %}
+          {% if request.user.is_superuser %}
+          <th>Client</th> <!-- New column for Client -->
+          {% endif %}
           <th>Date Joined</th>
           <th>Actions</th>
         </tr>
@@ -42,6 +47,7 @@
           <td><span>{{ user.username }}</span></td>
           <td><span>{{ user.email }}</span></td>
 
+          {% if request.user.is_superuser %}
           <td>
             {% for role in user.roles.all %}
                 <a href="{% url 'edit-role' role.id %}" class="btn btn-sm btn-info me-1">
@@ -51,6 +57,17 @@
                 <span class="text-muted">No roles assigned</span>
             {% endfor %}
           </td>
+          {% endif %}
+
+          {% if request.user.is_superuser %}
+          <td>
+            {% if user.client %}
+              {{ user.client.name }}
+            {% else %}
+              <span class="text-muted">No client assigned</span>
+            {% endif %}
+          </td>
+          {% endif %}
           <td>
             <span class="badge bg-label-primary me-1">{{ user.date_joined }}</span>
           <td>
@@ -66,7 +83,7 @@
                   </a>
                 {% endif %}
 
-                {% if perms.users.delete_customuser %}
+                {% if perms.users.delete_customuser and user != request.user %}
                   <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#deleteModal{{ user.id }}">
                     <i class="bx bx-trash me-1"></i> Delete
                   </button>

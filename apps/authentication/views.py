@@ -93,7 +93,7 @@ class AuthView(TemplateView):
         roles = Role.objects.all()
 
         # Group permissions by app and model, excluding specific apps
-        excluded_apps = ['social_django', 'sessions', 'contenttypes', 'auth', 'admin']
+        excluded_apps = ['social_django', 'sessions', 'contenttypes', 'auth', 'admin', 'Social_config', 'Social']
         permissions = Permission.objects.exclude(
             content_type__app_label='authentication',
             content_type__model='customuser'
@@ -207,7 +207,7 @@ class AuthView(TemplateView):
 
         # Group permissions by (app_label, model) with CRUD mapping
         grouped_permissions = defaultdict(lambda: {'create': None, 'read': None, 'update': None, 'delete': None})
-        excluded_apps = ['social_django', 'sessions', 'contenttypes', 'auth', 'admin']
+        excluded_apps = ['social_django', 'sessions', 'contenttypes', 'auth', 'admin', 'Social_config', 'Social']
         all_permissions = Permission.objects.exclude(
             content_type__app_label='authentication',
             content_type__model='customuser'
@@ -285,7 +285,7 @@ class AuthView(TemplateView):
 
                 return redirect("list-permissions")
 
-        excluded_apps = ['auth', 'admin', 'sessions', 'contenttypes', 'social_django']
+        excluded_apps = ['social_django', 'sessions', 'contenttypes', 'auth', 'admin', 'Social_config', 'Social']
         permissions = Permission.objects.exclude(
             content_type__app_label__in=excluded_apps
         ).order_by('content_type__app_label', 'content_type__model', 'codename')

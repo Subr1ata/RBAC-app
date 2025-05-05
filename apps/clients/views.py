@@ -1,5 +1,5 @@
 from web_project import TemplateLayout
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .forms import ClientRegistrationForm
 import uuid
@@ -71,3 +71,47 @@ def add_client_ajax(request):
         else:
             return JsonResponse({'success': False, 'errors': form.errors})
     return JsonResponse({'success': False, 'message': 'Invalid request method.'})
+
+@csrf_exempt
+def delete_client_ajax(request, client_id):
+    if request.method == 'POST':
+        client = get_object_or_404(Client, id=client_id)
+        client.delete()
+        messages.success(request, "Client deleted successfully!")
+        return JsonResponse({'success': True, 'message': 'Client deleted successfully!'})
+    messages.error(request, "Something went wrong!")
+    return JsonResponse({'success': False, 'message': 'Invalid request method.'})
+
+@csrf_exempt
+def update_client_ajax(request, client_id):
+    if request.method == 'POST':
+        client = get_object_or_404(Client, id=client_id)
+        form = ClientRegistrationForm(request.POST, instance=client)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Client updated successfully!")
+            return JsonResponse({'success': True, 'message': 'Client updated successfully!'})
+        else:
+            messages.error(request, f"Something went wrong! Errors: {form.errors}")
+            return JsonResponse({'success': False, 'errors': form.errors})
+    messages.error(request, "Invalid request method.")
+    return JsonResponse({'success': False, 'message': 'Invalid request method.'})
+
+@csrf_exempt
+def get_client_ajax(request, client_id):
+    if request.method == 'GET':
+        try:
+            client = get_object_or_404(Client, id=client_id)
+            client_data = {
+                'id': client.id,
+                'name': client.name,
+                'email': client.email,
+                'business_name': client.business_name,
+                'phone_number': client.phone_number,
+                'address': client.address,
+            }
+            return JsonResponse({'success': True, 'client': client_data})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': f'Error retrieving client: {str(e)}'}, status=500)
+    return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=405)
+    # return JsonResponse({'success': False, 'message': 'Invalid request method.'})

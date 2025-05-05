@@ -19,8 +19,9 @@
                 <th>#</th>
                 <th>Name</th>
                 <th>Email</th>
-                <th>API Key</th>
-                <th>Created At</th>
+                <th>Business Name</th>
+                <th>Phone Number</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -29,8 +30,15 @@
                 <td>{{ forloop.counter }}</td>
                 <td>{{ client.name }}</td>
                 <td>{{ client.email }}</td>
-                <td>{{ client.api_key }}</td>
-                <td>{{ client.created_at }}</td>
+                <td>{{ client.business_name }}</td>
+                <td>{{ client.phone_number }}</td>
+                <td>
+                  <!-- Edit Button -->
+                  <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editClientModal"
+                    onclick="loadClientData({{ client.id }})">Edit</button>
+                  <!-- Delete Button -->
+                  <button class="btn btn-sm btn-danger" onclick="deleteClient({{ client.id }})">Delete</button>
+                </td>
             </tr>
             {% empty %}
             <tr>
@@ -75,32 +83,26 @@
               {% csrf_token %}
               <!-- Name Field -->
               <div class="mb-3">
-                {% comment %} <label for="id_name" class="form-label">Client Name</label> {% endcomment %}
                 {{ form.name|as_crispy_field }}
               </div>
               <!-- Email Field -->
               <div class="mb-3">
-                {% comment %} <label for="id_email" class="form-label">Email Address</label> {% endcomment %}
                 {{ form.email|as_crispy_field }}
               </div>
               <!-- Business Name Field -->
               <div class="mb-3">
-                {% comment %} <label for="id_business_name" class="form-label">Business Name</label> {% endcomment %}
                 {{ form.business_name|as_crispy_field }}
               </div>
               <!-- Phone Number Field -->
               <div class="mb-3">
-                {% comment %} <label for="id_phonenumber" class="form-label">Phone Number</label> {% endcomment %}
                 {{ form.phone_number|as_crispy_field }}
               </div>
               <!-- Address Field -->
               <div class="mb-3">
-                {% comment %} <label for="id_address" class="form-label">Address</label> {% endcomment %}
                 {{ form.address|as_crispy_field }}
               </div>
               <!-- Unique Store Code Field -->
               <div class="mb-3">
-                {% comment %} <label for="id_uniquestorecode" class="form-label">Unique Store Code</label> {% endcomment %}
                 {{ form.unique_store_code|as_crispy_field }}
               </div>
               <!-- Submit Button -->
@@ -110,24 +112,136 @@
                 </button>
               </div>
             </form>
-              {% comment %} <form id="addClientForm">
-                  {% csrf_token %}
-                  <div class="mb-3">
-                      <label for="id_name" class="form-label">Name</label>
-                      <input type="text" class="form-control" id="id_name" name="name" required>
-                  </div>
-                  <div class="mb-3">
-                      <label for="id_email" class="form-label">Email</label>
-                      <input type="email" class="form-control" id="id_email" name="email" required>
-                  </div>
-                  <button type="submit" class="btn btn-primary">Add Client</button>
-              </form> {% endcomment %}
           </div>
       </div>
   </div>
 </div>
 
+<!-- Edit Client Modal -->
+<div class="modal fade" id="editClientModal" tabindex="-1" aria-labelledby="editClientModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editClientModalLabel">Edit Client</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editClientForm">
+          {% csrf_token %}
+          <input type="hidden" id="editClientId">
+          <div class="mb-3">
+            <label for="editName" class="form-label">Name</label>
+            <input type="text" class="form-control" id="editName" name="name">
+          </div>
+          <div class="mb-3">
+            <label for="editEmail" class="form-label">Email</label>
+            <input type="email" class="form-control" id="editEmail" name="email">
+          </div>
+          <div class="mb-3">
+            <label for="editBusinessName" class="form-label">Business Name</label>
+            <input type="text" class="form-control" id="editBusinessName" name="business_name">
+          </div>
+          <div class="mb-3">
+            <label for="editPhoneNumber" class="form-label">Phone Number</label>
+            <input type="text" class="form-control" id="editPhoneNumber" name="phone_number">
+          </div>
+          <div class="mb-3">
+            <label for="editAddress" class="form-label">Address</label>
+            <textarea class="form-control" id="editAddress" name="address" rows="3"></textarea>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="updateClient()">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if messages %}
+  {% for message in messages %}
+    {% if message.tags == "success" %}
+      <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body">
+              {{ message }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{% block page_js %}
+{{ block.super }}
 <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const toastElement = document.getElementById('successToast');
+    if (toastElement) {
+      const toast = new bootstrap.Toast(toastElement);
+      toast.show();
+    }
+  });
+</script>
+{% endblock page_js %}
+<script>
+  // Load client data into the edit form
+  function loadClientData(clientId) {
+    fetch(`/client/${clientId}/`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById('editClientId').value = clientId;
+          document.getElementById('editName').value = data.client.name;
+          document.getElementById('editEmail').value = data.client.email;
+          document.getElementById('editBusinessName').value = data.client.business_name;
+          document.getElementById('editPhoneNumber').value = data.client.phone_number;
+          document.getElementById('editAddress').value = data.client.address;
+        }
+      });
+  }
+
+  // Update client via AJAX
+  function updateClient() {
+    const clientId = document.getElementById('editClientId').value;
+    const formData = new FormData(document.getElementById('editClientForm'));
+    fetch(`/client/update/${clientId}/`, {
+      method: 'POST',
+      body: formData,
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          //alert(data.message);
+          location.reload();
+        } else {
+          alert('Error: ' + JSON.stringify(data.errors));
+          console.error('Error: ' + JSON.stringify(data.errors));
+        }
+      });
+  }
+
+  // Delete client via AJAX
+  function deleteClient(clientId) {
+    if (confirm('Are you sure you want to delete this client?')) {
+      fetch(`/client/delete/${clientId}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            location.reload();
+          } else {
+            console.error('Error: ', data);
+          }
+        });
+    }
+  }
+
   document.getElementById('addClientForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const formData = new FormData(this);
@@ -142,10 +256,11 @@
       .then(response => response.json())
       .then(data => {
           if (data.success) {
-              alert(data.message);
+              //alert(data.message);
               location.reload(); // Reload the page to show the new client
           } else {
-              alert("Error: " + JSON.stringify(data.errors));
+              //alert("Error: " + JSON.stringify(data.errors));
+              console.error("Error: " + JSON.stringify(data.errors));
           }
       })
       .catch(error => console.error('Error:', error));
